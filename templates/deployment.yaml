@@ -1,0 +1,33 @@
+{{ $version := .Values.version }}
+{{ range .Values.deployments }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .name }}
+    spec:
+      containers:
+      - image: {{ .image }}:{{ .name }}-{{ $version }}
+        name: {{ .name }}
+        env:
+        {{- range $key, $value := .env }}
+          {{- if $value }}
+          - name: {{ $key }}
+            value: {{ $value }}
+          {{- else }}
+          - name: {{ $key }}
+            valueFrom:
+              secretKeyRef:
+                name: secrets
+                key: {{ $key }}
+          {{- end }}
+        {{- end }}
+---
+{{ end }}

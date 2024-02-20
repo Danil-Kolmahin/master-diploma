@@ -1,0 +1,18 @@
+deployments:
+  - name: frontend
+    image: danilkolmahin/master-diploma
+  - name: backend
+    image: danilkolmahin/master-diploma
+    env:
+      DATABASE_PASSWORD:
+
+services:
+  - app: backend
+
+ingresses:
+  - service: backend
+    host: localhost
+    path: /
+
+secrets:
+  DATABASE_PASSWORD:
