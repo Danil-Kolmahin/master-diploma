@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20.10.0'
-      - run: npm ci
+      - run: npm i
       - run: echo "VERSION=$(npm pkg get version | tr -d \")" >> $GITHUB_ENV
       - run: VERSION=${{ env.VERSION }} npm run build-projects
       - uses: docker/login-action@v3
