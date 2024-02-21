@@ -7,12 +7,16 @@ deployments:
       DATABASE_PASSWORD:
 
 services:
+  - app: frontend
   - app: backend
 
 ingresses:
-  - service: backend
+  - service: frontend
     host: localhost
     path: /
+  - service: backend
+    host: localhost
+    path: /{whatever:.+}
 
 secrets:
   DATABASE_PASSWORD:

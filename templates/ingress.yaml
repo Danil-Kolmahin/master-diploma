@@ -21,6 +21,6 @@ spec:
             port:
               number: 80
         path: {{ .path }}
-        pathType: Prefix
+        pathType: Exact
 ---
 {{ end }}
