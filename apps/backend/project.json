@@ -21,7 +21,7 @@
     },
     "docker-build": {
       "dependsOn": ["build"],
-      "command": "APP_NAME=backend docker build --build-arg APP_NAME=${APP_NAME} -f apps/${APP_NAME}/Dockerfile . -t \"danilkolmahin/master-diploma:${APP_NAME}-${VERSION}\""
+      "command": "docker build --build-arg APP_NAME=backend -f apps/backend/Dockerfile . -t \"danilkolmahin/master-diploma:backend-${VERSION}\""
     }
   },
   "tags": []
