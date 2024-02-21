@@ -2,7 +2,13 @@
   "name": "@master-diploma/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "build-projects": "nx run-many --target=docker-build",
+    "list-build-projects": "nx show projects --with-target=docker-build",
+    "serve-build-app": "node main.js",
+    "test": "nx run-many --target test",
+    "start": "nx serve"
+  },
   "private": true,
   "dependencies": {
     "@emotion/react": "11.11.1",

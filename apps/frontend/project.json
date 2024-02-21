@@ -3,6 +3,11 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/frontend/src",
   "projectType": "application",
-  "targets": {},
+  "targets": {
+    "docker-build": {
+      "dependsOn": ["build"],
+      "command": "APP_NAME=frontend docker build --build-arg APP_NAME=${APP_NAME} -f apps/${APP_NAME}/Dockerfile . -t \"danilkolmahin/master-diploma:${APP_NAME}-${VERSION}\""
+    }
+  },
   "tags": []
 }
