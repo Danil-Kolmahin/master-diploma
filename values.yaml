@@ -13,7 +13,7 @@ services:
 ingresses:
   - service: frontend
     host: localhost
-    path: /
+    path: /,/favicon.ico,/runtime{whatever:.*},/main{whatever:.*}
   - service: backend
     host: localhost
     path: /{whatever:.+}
