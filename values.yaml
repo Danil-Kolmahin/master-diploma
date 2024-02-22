@@ -15,7 +15,7 @@ ingresses:
     host: localhost
     paths:
       - /
-      - /favicon.ico
+      - /favicon{whatever:.*}
       - /runtime{whatever:.*}
       - /main{whatever:.*}
   - service: backend
