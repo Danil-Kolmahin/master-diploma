@@ -10,7 +10,9 @@ const StyledApp = styled.div`
 
 export function App() {
   useEffect(() => {
-    axios('/version').then(r => console.log(r));
+    axios('http://localhost/version')
+      .then(r => console.log(r))
+      .catch(r => console.log(r));
   }, []);
 
   return (
