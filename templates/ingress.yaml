@@ -1,8 +1,9 @@
 {{ range .Values.ingresses }}
+{{- $service := .service -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .service }}
+  name: {{ $service }}
   annotations:
     kubernetes.io/ingress.class: traefik
     cert-manager.io/cluster-issuer: {{ .clusterIssuer }}
@@ -10,17 +11,19 @@ spec:
   tls:
   - hosts:
     - {{ .host }}
-    secretName: {{ .service }}
+    secretName: {{ $service }}
   rules:
   - host: {{ .host }}
     http:
       paths:
+      {{ range .paths }}
       - backend:
           service:
-            name: {{ .service }}
+            name: {{ $service }}
             port:
               number: 80
-        path: {{ .path }}
+        path: {{ . }}
         pathType: Exact
+      {{ end }}
 ---
 {{ end }}

@@ -13,10 +13,15 @@ services:
 ingresses:
   - service: frontend
     host: localhost
-    path: /,/favicon.ico,/runtime{whatever:.*},/main{whatever:.*}
+    paths:
+      - /
+      - /favicon.ico
+      - /runtime{whatever:.*}
+      - /main{whatever:.*}
   - service: backend
     host: localhost
-    path: /{whatever:.+}
+    paths:
+      - /{whatever:.+}
 
 secrets:
   DATABASE_PASSWORD:
