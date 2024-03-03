@@ -17,6 +17,8 @@ Feature: Namespaces
 
   Scenario: Namespaces other then root should branch from some other namespace
 
+  Scenario: Secret/variable created in child namespace owerwrites parental namespace secret/variable with such name
+
   ### Not priority
 
   Scenario: CRUD for non-root namespaces for non-root users according to permissions

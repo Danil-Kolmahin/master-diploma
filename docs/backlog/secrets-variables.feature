@@ -6,6 +6,8 @@ Feature: Secrets/Variables
 
   Scenario: Secrets/variables each belongs to some namespace
 
+  Scenario: Secret/variable should have unique (for project) name
+
   ### Not priority
 
   Scenario: CRUD for secrets/variables for non-root users according to permissions
