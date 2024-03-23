@@ -1,7 +1,22 @@
 {
   "recommendations": [
-    "nrwl.angular-console",
+    "akankshasingh872.case-change",
+    "streetsidesoftware.code-spell-checker",
+    "ms-azuretools.vscode-docker",
+    "mikestead.dotenv",
+    "editorconfig.editorconfig",
+    "dbaeumer.vscode-eslint",
+    "andrejunges.handlebars",
+    "visualstudioexptteam.vscodeintellicode",
+    "ms-toolsai.jupyter-keymap",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "yzhang.markdown-all-in-one",
+    "christian-kohler.path-intellisense",
+    "jebbs.plantuml",
     "esbenp.prettier-vscode",
-    "firsttris.vscode-jest-runner"
+    "ms-vscode-remote.remote-ssh",
+    "pmneo.tsimporter",
+    "technosophos.vscode-helm",
+    "redhat.vscode-yaml"
   ]
 }
