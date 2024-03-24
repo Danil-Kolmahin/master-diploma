@@ -1,5 +1,30 @@
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/react';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
+
+require('highcharts/modules/accessibility.js')(Highcharts)
+require('highcharts/modules/venn.js')(Highcharts)
+
+const options = {
+  title: { text: '' },
+  credits: { enabled: false },
+  series: [{
+    type: 'venn',
+    data: [{
+      sets: ['A'],
+      value: 4,
+      name: 'Euler diagrams',
+    }, {
+      sets: ['B'],
+      value: 1,
+      name: 'Venn diagrams',
+    }, {
+      sets: ['A', 'B'],
+      value: 1
+    }]
+  }],
+}
 
 const GlobalStyle = css`
   * {
@@ -30,6 +55,7 @@ const Sidebar = styled.div`
   border-right: 1px solid rgb(192, 192, 192);
   box-shadow: 0.25px 0px 0px 0px rgb(192, 192, 192);
   padding: 10px;
+  vertical-align: top;
 
   hr {
     margin-bottom: 10px;
@@ -56,7 +82,9 @@ export function App() {
           <SidebarItem>some.user@example.com</SidebarItem>
           <SidebarItem>MyProject</SidebarItem>
           <hr />
-          <b><SidebarItem>namespaces - secrets-variables</SidebarItem></b>
+          <b>
+            <SidebarItem>namespaces - secrets-variables</SidebarItem>
+          </b>
           <SidebarItem>applications - integrations-bridges</SidebarItem>
           <SidebarItem>members</SidebarItem>
           <SidebarItem>roles - permissions</SidebarItem>
@@ -64,7 +92,10 @@ export function App() {
           <SidebarItem>log out</SidebarItem>
         </Sidebar>
         <Content>
-          <span>Test.</span>
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={options}
+          />
         </Content>
       </StyledApp>
     </>
