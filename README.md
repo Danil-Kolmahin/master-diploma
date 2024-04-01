@@ -1,5 +1,5 @@
 # Secret Management System
-> This repository contains the source code of the master's thesis on the topic **"A method of designing a system for managing confidential data in software"**.
+> This repository contains the source code of the master's thesis on the topic **"Method of managing confidential data in software development"**.
 
 ## Definition
 The purpose of this work was to propose a new approach to determining the location of "secrets" in the modern software development process, which includes creating an application that will provide the ability to store secrets, define different values of secrets for different environments as needed, configure the hierarchy and dependency of secrets in one from one (also if necessary). Also, the service should provide an API for using secrets in user applications, update secrets in the application when the secrets database changes, define a set of mandatory and optional secrets for a specific application.
