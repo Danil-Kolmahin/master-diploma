@@ -1,6 +1,9 @@
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/react';
-import { Chart } from './chart';
+import { Chart } from './Chart';
+import { Auth } from './Auth';
+import { NotFound } from './NotFound';
+import { PrivateKeyCatcher } from './PrivateKeyCatcher';
 
 const GlobalStyle = css`
   * {
@@ -70,6 +73,9 @@ export function App() {
         <Content>
           <Chart />
         </Content>
+        {/* <Auth /> */}
+        {/* <NotFound /> */}
+        {/* <PrivateKeyCatcher /> */}
       </StyledApp>
     </>
   );
