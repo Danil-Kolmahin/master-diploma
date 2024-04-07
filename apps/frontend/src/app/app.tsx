@@ -4,6 +4,8 @@ import { Chart } from './Chart';
 import { Auth } from './Auth';
 import { NotFound } from './NotFound';
 import { PrivateKeyCatcher } from './PrivateKeyCatcher';
+import { Route, Routes } from 'react-router-dom';
+import { ContentContainer } from './ContentContainer';
 
 const GlobalStyle = css`
   * {
@@ -28,57 +30,20 @@ const StyledApp = styled.div`
   height: 100vh;
 `;
 
-const Sidebar = styled.div`
-  display: table-cell;
-  width: 300px;
-  border-right: 1px solid rgb(192, 192, 192);
-  box-shadow: 0.25px 0px 0px 0px rgb(192, 192, 192);
-  padding: 10px;
-  vertical-align: top;
-
-  hr {
-    margin-bottom: 10px;
-  }
-`;
-
-const Content = styled.div`
-  display: table-cell;
-  padding: 10px;
-`;
-
-const SidebarItem = styled.span`
-  display: block;
-  margin-bottom: 10px;
-  text-align: center;
-`;
-
-export function App() {
+export const App = () => {
   return (
     <>
       <Global styles={GlobalStyle} />
       <StyledApp>
-        <Sidebar>
-          <SidebarItem>some.user@example.com</SidebarItem>
-          <SidebarItem>MyProject</SidebarItem>
-          <hr />
-          <b>
-            <SidebarItem>namespaces - secrets-variables</SidebarItem>
-          </b>
-          <SidebarItem>applications - integrations-bridges</SidebarItem>
-          <SidebarItem>members</SidebarItem>
-          <SidebarItem>roles - permissions</SidebarItem>
-          <SidebarItem>projects</SidebarItem>
-          <SidebarItem>log out</SidebarItem>
-        </Sidebar>
-        <Content>
-          <Chart />
-        </Content>
-        {/* <Auth /> */}
-        {/* <NotFound /> */}
-        {/* <PrivateKeyCatcher /> */}
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/private-key-catcher" element={<PrivateKeyCatcher />} />
+          <Route element={<ContentContainer />}>
+            <Route path="/" element={<Chart />} />
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </StyledApp>
     </>
   );
-}
-
-export default App;
+};
