@@ -1,4 +1,12 @@
 import styled from '@emotion/styled';
+import axios from 'axios';
+import { useCallback, useState } from 'react';
+import {
+  extractPrivateKey,
+  extractPublicKey,
+  generateKeyPair,
+  saveFile,
+} from './utils';
 
 const Container = styled.div`
   display: flex;
@@ -68,21 +76,89 @@ const Divider = styled.span`
 `;
 
 export const Auth = () => {
+  const [email, setEmail] = useState('');
+  const [projectName, setProjectName] = useState('');
+
+  const signIn = useCallback(async (email: string, projectName: string) => {
+    try {
+      const { access_token } = (
+        await axios.post(`http://localhost:3001/sign-in`, {
+          email,
+          projectName,
+        })
+      ).data;
+      console.log(access_token);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  const signUp = useCallback(
+    async (email: string, projectName: string) => {
+      try {
+        const keyPair = await generateKeyPair();
+        await axios.post('http://localhost:3001/sign-up', {
+          email,
+          publicKey: await extractPublicKey(keyPair.publicKey),
+          projectName,
+        });
+        saveFile(
+          await extractPrivateKey(keyPair.privateKey),
+          'private_key.pem',
+          'application/pem-certificate-chain'
+        );
+
+        await signIn(email, projectName);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [signIn]
+  );
+
   return (
     <Container>
       <Form>
         <FormGroup>
           <Label htmlFor="email">email</Label>
-          <Input id="email" type="email" required />
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </FormGroup>
         <FormGroup>
           <Label htmlFor="project">project</Label>
-          <Input id="project" type="text" required />
+          <Input
+            id="project"
+            type="text"
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+            required
+          />
         </FormGroup>
         <ButtonGroup>
-          <Button type="submit">sign up</Button>
+          <Button
+            type="submit"
+            onClick={(e) => {
+              e.preventDefault();
+              if (email && projectName) signUp(email, projectName);
+            }}
+          >
+            sign up
+          </Button>
           <Divider>/</Divider>
-          <Button type="submit">sign in</Button>
+          <Button
+            type="submit"
+            onClick={(e) => {
+              e.preventDefault();
+              if (email && projectName) signIn(email, projectName);
+            }}
+          >
+            sign in
+          </Button>
         </ButtonGroup>
       </Form>
     </Container>
