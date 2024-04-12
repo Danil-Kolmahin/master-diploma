@@ -64,15 +64,13 @@ export class AppController {
     const challenge = randomBytes(32).toString('hex');
     await this.challengesService.insert(challenge, user.id);
 
-    console.log(challenge, user.publicKey.toString());
-
     return publicEncrypt(
       {
         key: user.publicKey,
         padding: constants.RSA_PKCS1_OAEP_PADDING,
         oaepHash: 'sha256',
       },
-      Buffer.from(challenge, 'utf8')
+      Buffer.from(challenge)
     ).toString('base64');
   }
 

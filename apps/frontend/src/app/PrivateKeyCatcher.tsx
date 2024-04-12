@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import axios from 'axios';
 import { getTextFromFile } from './utils/file-management';
 import { getPrivateKeyFromFile } from './utils/key-pair';
-import { saveToDB } from './utils/indexed-db';
+import { getFromDB, saveToDB } from './utils/indexed-db';
 import { useParams } from 'react-router-dom';
 
 const Container = styled.div`
@@ -70,25 +70,23 @@ export const PrivateKeyCatcher = () => {
           })
         ).data;
 
-        const challengeBuffer = new Uint8Array(
-          (window.atob(encryptedChallenge).match(/[\s\S]/g) || []).map((char) =>
-            char.charCodeAt(0)
+        const challenge = new TextDecoder().decode(
+          await window.crypto.subtle.decrypt(
+            { name: 'RSA-OAEP' },
+            await getFromDB(),
+            Uint8Array.from(window.atob(encryptedChallenge), (c) =>
+              c.charCodeAt(0)
+            )
           )
-        );
-
-        const decrypted = await window.crypto.subtle.decrypt(
-          { name: 'RSA-OAEP' },
-          privateKey,
-          challengeBuffer
         );
 
         await axios.post(`http://localhost:3001/sign-in/challenge-response`, {
           email,
           projectName,
-          challenge: new TextDecoder().decode(decrypted),
+          challenge,
         });
 
-        console.log(await axios.get(`http://localhost:3001/profile`));
+        console.log((await axios.get(`http://localhost:3001/profile`)).data);
       } catch (error) {
         console.error(error);
       }
