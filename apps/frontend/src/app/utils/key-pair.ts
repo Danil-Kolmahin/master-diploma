@@ -11,7 +11,18 @@ export const generateKeyPair = async (): Promise<CryptoKeyPair> =>
   );
 
 const ab2str = (buf: ArrayBuffer): string => {
-  return String.fromCharCode.apply(null, new Uint8Array(buf) as any);
+  return String.fromCharCode.apply(
+    null,
+    new Uint8Array(buf) as unknown as number[]
+  );
+};
+
+const str2ab = (str: string): ArrayBuffer => {
+  const buf = new ArrayBuffer(str.length);
+  const bufView = new Uint8Array(buf);
+  for (let i = 0, strLen = str.length; i < strLen; i++)
+    bufView[i] = str.charCodeAt(i);
+  return buf;
 };
 
 export const extractPublicKey = async (
@@ -38,16 +49,25 @@ export const extractPrivateKey = async (
   )}\n-----END PRIVATE KEY-----`;
 };
 
-export const saveFile = (
-  file: string,
-  name = 'file.txt',
-  type = 'text/plain;charset=utf-8'
-): void => {
-  const a = document.createElement('a');
-  a.download = name;
-  a.href = URL.createObjectURL(new Blob([file], { type }));
-  a.addEventListener('click', () => {
-    setTimeout(() => URL.revokeObjectURL(a.href), 30 * 1000);
-  });
-  a.click();
+export const getPrivateKeyFromFile = async (
+  file: string
+): Promise<CryptoKey> => {
+  const pemHeader = '-----BEGIN PRIVATE KEY-----';
+  const pemFooter = '-----END PRIVATE KEY-----';
+  const pemContents = file.substring(
+    pemHeader.length,
+    file.length - pemFooter.length - 1
+  );
+
+  const binaryDerString = window.atob(pemContents);
+
+  const binaryDer = str2ab(binaryDerString);
+
+  return window.crypto.subtle.importKey(
+    'pkcs8',
+    binaryDer,
+    { name: 'RSA-OAEP', hash: 'SHA-256' },
+    false,
+    ['decrypt']
+  );
 };

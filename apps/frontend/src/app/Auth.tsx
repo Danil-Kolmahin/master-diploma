@@ -5,8 +5,9 @@ import {
   extractPrivateKey,
   extractPublicKey,
   generateKeyPair,
-  saveFile,
-} from './utils';
+} from './utils/key-pair';
+import { saveFile } from './utils/file-management';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   display: flex;
@@ -78,25 +79,23 @@ const Divider = styled.span`
 export const Auth = () => {
   const [email, setEmail] = useState('');
   const [projectName, setProjectName] = useState('');
+  const navigate = useNavigate();
 
-  const signIn = useCallback(async (email: string, projectName: string) => {
-    try {
-      const { access_token } = (
-        await axios.post(`http://localhost:3001/sign-in`, {
-          email,
-          projectName,
-        })
-      ).data;
-      console.log(access_token);
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
+  const signIn = useCallback(
+    async (email: string, projectName: string) => {
+      try {
+        navigate('/private-key-catcher');
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [navigate]
+  );
 
   const signUp = useCallback(
     async (email: string, projectName: string) => {
       try {
-        const keyPair = await generateKeyPair();
+        let keyPair: CryptoKeyPair | null = await generateKeyPair();
         await axios.post('http://localhost:3001/sign-up', {
           email,
           publicKey: await extractPublicKey(keyPair.publicKey),
@@ -107,6 +106,7 @@ export const Auth = () => {
           'private_key.pem',
           'application/pem-certificate-chain'
         );
+        keyPair = null;
 
         await signIn(email, projectName);
       } catch (error) {

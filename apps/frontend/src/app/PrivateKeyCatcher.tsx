@@ -1,5 +1,9 @@
-import { ChangeEvent, useCallback } from 'react';
+import { ChangeEvent, useCallback, DragEvent } from 'react';
 import styled from '@emotion/styled';
+import axios from 'axios';
+import { getTextFromFile } from './utils/file-management';
+import { getPrivateKeyFromFile } from './utils/key-pair';
+import { saveToDB } from './utils/indexed-db';
 
 const Container = styled.div`
   display: flex;
@@ -15,12 +19,13 @@ const HiddenFileInput = styled.input`
 const Box = styled.div`
   border: 1px solid;
   border-image: repeating-linear-gradient(
-    135deg,
-    #ccc,
-    #ccc 10px,
-    transparent 10px,
-    transparent 20px
-  ) 1 round;
+      135deg,
+      #ccc,
+      #ccc 10px,
+      transparent 10px,
+      transparent 20px
+    )
+    1 round;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -45,22 +50,35 @@ const KeyButton = styled.label`
 `;
 
 export const PrivateKeyCatcher = () => {
-  const onFileDrop = useCallback((event: any) => {
-    const files = event.dataTransfer.files;
-    // Process the files as needed
+  const catchFiles = useCallback(async (fileList: FileList) => {
+    try {
+      if (fileList.length < 1) return;
+      const file = fileList.item(0) as File;
+      if (file.name.slice(-4) !== '.pem') return;
+      const fileText = await getTextFromFile(file);
+      const privateKey = await getPrivateKeyFromFile(fileText);
+      saveToDB(privateKey);
+      await axios.post(`http://localhost:3001/sign-in`, {
+        email: 'test@example.com',
+        projectName: 'p1',
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }, []);
 
-  const onFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    // Process the files as needed
-  };
-
   return (
-    <Container onDrop={onFileDrop}>
+    <Container
+      onDrop={(event: DragEvent<HTMLDivElement>) =>
+        catchFiles(event.dataTransfer.files)
+      }
+    >
       <HiddenFileInput
         type="file"
         id="privateKey"
-        onChange={onFileSelect}
+        onChange={(event: ChangeEvent<HTMLInputElement>) =>
+          event.target.files ? catchFiles(event.target.files) : undefined
+        }
         multiple={false}
       />
       <Box>
