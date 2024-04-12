@@ -95,7 +95,7 @@ export class AppController {
     if (!validChallenge) throw new UnauthorizedException();
 
     const access_token = await this.authService.signIn(email, projectName);
-    res.cookie('SMS_access_token', access_token, {
+    res.cookie('SMS_ACCESS_TOKEN', access_token, {
       maxAge: 5 * 60 * 1000,
       // TODO: secure: true,
       sameSite: 'strict',
@@ -105,7 +105,7 @@ export class AppController {
 
   @Get('logout')
   logout(@Res({ passthrough: true }) res: Response) {
-    res.cookie('SMS_access_token', '', {
+    res.cookie('SMS_ACCESS_TOKEN', '', {
       maxAge: 0,
       // TODO: secure: true,
       sameSite: 'strict',

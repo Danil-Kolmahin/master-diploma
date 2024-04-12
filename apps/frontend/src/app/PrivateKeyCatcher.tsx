@@ -4,7 +4,7 @@ import axios from 'axios';
 import { getTextFromFile } from './utils/file-management';
 import { getPrivateKeyFromFile } from './utils/key-pair';
 import { getFromDB, saveToDB } from './utils/indexed-db';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const Container = styled.div`
   display: flex;
@@ -52,6 +52,7 @@ const KeyButton = styled.label`
 
 export const PrivateKeyCatcher = () => {
   const { email, projectName } = useParams();
+  const navigate = useNavigate();
 
   const catchFiles = useCallback(
     async (fileList: FileList) => {
@@ -64,7 +65,7 @@ export const PrivateKeyCatcher = () => {
         saveToDB(privateKey);
 
         const encryptedChallenge = (
-          await axios.post(`http://localhost:3001/sign-in/challenge-request`, {
+          await axios.post('/sign-in/challenge-request', {
             email,
             projectName,
           })
@@ -80,18 +81,18 @@ export const PrivateKeyCatcher = () => {
           )
         );
 
-        await axios.post(`http://localhost:3001/sign-in/challenge-response`, {
+        await axios.post('/sign-in/challenge-response', {
           email,
           projectName,
           challenge,
         });
 
-        console.log((await axios.get(`http://localhost:3001/profile`)).data);
+        navigate('/');
       } catch (error) {
-        console.error(error);
+        navigate('/auth');
       }
     },
-    [email, projectName]
+    [email, projectName, navigate]
   );
 
   return (

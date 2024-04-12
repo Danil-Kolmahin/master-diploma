@@ -1,5 +1,7 @@
 import styled from '@emotion/styled';
-import { NavLink, Outlet } from 'react-router-dom';
+import axios, { isAxiosError } from 'axios';
+import { useEffect, useState } from 'react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 
 const Sidebar = styled.div`
   display: table-cell;
@@ -45,18 +47,40 @@ const SidebarItemLink = styled(NavLink)`
 `;
 
 export const ContentContainer = () => {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [projectName, setProjectName] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await axios.get('/profile');
+        setEmail(response.data.email);
+        setProjectName(response.data.projectName);
+      } catch (error) {
+        if (isAxiosError(error)) navigate('/auth');
+      }
+    })();
+  }, [navigate]);
+
   return (
     <>
       <Sidebar>
-        <SidebarItem>some.user@example.com</SidebarItem>
-        <SidebarItem>MyProject</SidebarItem>
+        <SidebarItem>{email}</SidebarItem>
+        <SidebarItem>{projectName}</SidebarItem>
         <hr />
         <SidebarItemLink to="/">namespaces - secrets-variables</SidebarItemLink>
-        <SidebarItemLink to="/not-implemented">applications - integrations-bridges</SidebarItemLink>
+        <SidebarItemLink to="/not-implemented">
+          applications - integrations-bridges
+        </SidebarItemLink>
         <SidebarItemLink to="/not-implemented">members</SidebarItemLink>
-        <SidebarItemLink to="/not-implemented">roles - permissions</SidebarItemLink>
+        <SidebarItemLink to="/not-implemented">
+          roles - permissions
+        </SidebarItemLink>
         <SidebarItemLink to="/not-implemented">projects</SidebarItemLink>
-        <SidebarItemLink to="/auth">log out</SidebarItemLink>
+        <SidebarItemLink to="/auth" onClick={() => axios('/logout')}>
+          log out
+        </SidebarItemLink>
       </Sidebar>
       <Content>
         <Outlet />

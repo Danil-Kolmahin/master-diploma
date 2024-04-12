@@ -96,7 +96,7 @@ export const Auth = () => {
     async (email: string, projectName: string) => {
       try {
         let keyPair: CryptoKeyPair | null = await generateKeyPair();
-        await axios.post('http://localhost:3001/sign-up', {
+        await axios.post('/sign-up', {
           email,
           publicKey: await extractPublicKey(keyPair.publicKey),
           projectName,

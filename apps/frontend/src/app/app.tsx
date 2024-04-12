@@ -6,6 +6,9 @@ import { NotFound } from './NotFound';
 import { PrivateKeyCatcher } from './PrivateKeyCatcher';
 import { Route, Routes } from 'react-router-dom';
 import { ContentContainer } from './ContentContainer';
+import axios from 'axios';
+
+axios.defaults.baseURL = 'http://localhost:3001';
 
 const GlobalStyle = css`
   * {
