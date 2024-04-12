@@ -7,3 +7,8 @@ export class SignInDto {
   @IsString()
   projectName: string;
 }
+
+export class SignInAndVerifyChallengeDto extends SignInDto {
+  @IsString()
+  challenge: string;
+}

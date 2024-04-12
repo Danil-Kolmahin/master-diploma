@@ -6,17 +6,19 @@ import { User } from './entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProjectsService } from './services/projects.service';
 import { Project } from './entities/project.entity';
+import { Challenge } from './entities/challenge.entity';
+import { ChallengesService } from './services/challenge.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Project]),
+    TypeOrmModule.forFeature([User, Project, Challenge]),
     JwtModule.register({
       global: true,
-      secret: process.env['JWT_SECRET'],
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '5m' },
     }),
   ],
-  providers: [UsersService, AuthService, ProjectsService],
-  exports: [UsersService, AuthService, ProjectsService],
+  providers: [UsersService, AuthService, ProjectsService, ChallengesService],
+  exports: [UsersService, AuthService, ProjectsService, ChallengesService],
 })
 export class LibraryModule {}

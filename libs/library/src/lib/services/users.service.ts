@@ -22,9 +22,7 @@ export class UsersService {
     } else {
       await this.usersRepository.insert({
         email,
-        publicKey: Buffer.from(
-          '\\x' + Buffer.from(publicKey, 'base64').toString('hex')
-        ),
+        publicKey: Buffer.from(publicKey),
       });
     }
   }

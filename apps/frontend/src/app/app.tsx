@@ -37,7 +37,7 @@ export const App = () => {
       <StyledApp>
         <Routes>
           <Route path="/auth" element={<Auth />} />
-          <Route path="/private-key-catcher" element={<PrivateKeyCatcher />} />
+          <Route path="/private-key-catcher/:email/:projectName" element={<PrivateKeyCatcher />} />
           <Route element={<ContentContainer />}>
             <Route path="/" element={<Chart />} />
           </Route>

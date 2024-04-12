@@ -4,6 +4,7 @@ import axios from 'axios';
 import { getTextFromFile } from './utils/file-management';
 import { getPrivateKeyFromFile } from './utils/key-pair';
 import { saveToDB } from './utils/indexed-db';
+import { useParams } from 'react-router-dom';
 
 const Container = styled.div`
   display: flex;
@@ -50,22 +51,50 @@ const KeyButton = styled.label`
 `;
 
 export const PrivateKeyCatcher = () => {
-  const catchFiles = useCallback(async (fileList: FileList) => {
-    try {
-      if (fileList.length < 1) return;
-      const file = fileList.item(0) as File;
-      if (file.name.slice(-4) !== '.pem') return;
-      const fileText = await getTextFromFile(file);
-      const privateKey = await getPrivateKeyFromFile(fileText);
-      saveToDB(privateKey);
-      await axios.post(`http://localhost:3001/sign-in`, {
-        email: 'test@example.com',
-        projectName: 'p1',
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
+  const { email, projectName } = useParams();
+
+  const catchFiles = useCallback(
+    async (fileList: FileList) => {
+      try {
+        if (fileList.length < 1) return;
+        const file = fileList.item(0) as File;
+        if (file.name.slice(-4) !== '.pem') return;
+        const fileText = await getTextFromFile(file);
+        const privateKey = await getPrivateKeyFromFile(fileText);
+        saveToDB(privateKey);
+
+        const encryptedChallenge = (
+          await axios.post(`http://localhost:3001/sign-in/challenge-request`, {
+            email,
+            projectName,
+          })
+        ).data;
+
+        const challengeBuffer = new Uint8Array(
+          (window.atob(encryptedChallenge).match(/[\s\S]/g) || []).map((char) =>
+            char.charCodeAt(0)
+          )
+        );
+
+        const decrypted = await window.crypto.subtle.decrypt(
+          { name: 'RSA-OAEP' },
+          privateKey,
+          challengeBuffer
+        );
+
+        await axios.post(`http://localhost:3001/sign-in/challenge-response`, {
+          email,
+          projectName,
+          challenge: new TextDecoder().decode(decrypted),
+        });
+
+        console.log(await axios.get(`http://localhost:3001/profile`));
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [email, projectName]
+  );
 
   return (
     <Container

@@ -11,6 +11,13 @@ export class ProjectsService {
     private projectsRepository: Repository<Project>
   ) {}
 
+  findOneByNameAndUserId(
+    name: string,
+    userId: string
+  ): Promise<Project | null> {
+    return this.projectsRepository.findOneBy({ name, createdBy: userId });
+  }
+
   async insert(name: string, userId: string): Promise<void | never> {
     const existingOne = await this.projectsRepository.findOneBy({
       createdBy: userId,

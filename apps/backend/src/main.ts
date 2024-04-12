@@ -2,8 +2,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
-
-// import { HttpExceptionFilter } from '@master-diploma/library';
+import cookieParser from 'cookie-parser';
 
 import { AppModule } from './app/app.module';
 
@@ -19,7 +18,7 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, 'assets'));
   app.setBaseViewsDir(join(__dirname, 'assets'));
   app.setViewEngine('hbs');
-  // app.useGlobalFilters(new HttpExceptionFilter());
+  app.use(cookieParser());
   const port = process.env.NODE_ENV === 'production' ? 80 : 3001;
   await app.listen(port);
   Logger.log(`🚀 Application is running on: http://localhost:${port}`);

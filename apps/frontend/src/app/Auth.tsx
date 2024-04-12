@@ -84,7 +84,7 @@ export const Auth = () => {
   const signIn = useCallback(
     async (email: string, projectName: string) => {
       try {
-        navigate('/private-key-catcher');
+        navigate(`/private-key-catcher/${email}/${projectName}`);
       } catch (error) {
         console.error(error);
       }
