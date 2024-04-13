@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import axios, { isAxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { deleteFromDB } from './utils/indexed-db';
 
 const Sidebar = styled.div`
   display: table-cell;
@@ -78,7 +79,13 @@ export const ContentContainer = () => {
           roles - permissions
         </SidebarItemLink>
         <SidebarItemLink to="/not-implemented">projects</SidebarItemLink>
-        <SidebarItemLink to="/auth" onClick={() => axios('/logout')}>
+        <SidebarItemLink
+          to="/auth"
+          onClick={() => {
+            deleteFromDB();
+            axios('/logout');
+          }}
+        >
           log out
         </SidebarItemLink>
       </Sidebar>

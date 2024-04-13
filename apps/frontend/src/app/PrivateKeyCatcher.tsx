@@ -97,9 +97,11 @@ export const PrivateKeyCatcher = () => {
 
   return (
     <Container
-      onDrop={(event: DragEvent<HTMLDivElement>) =>
-        catchFiles(event.dataTransfer.files)
-      }
+      onDragOver={(event: DragEvent<HTMLDivElement>) => event.preventDefault()}
+      onDrop={(event: DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        catchFiles(event.dataTransfer.files);
+      }}
     >
       <HiddenFileInput
         type="file"
