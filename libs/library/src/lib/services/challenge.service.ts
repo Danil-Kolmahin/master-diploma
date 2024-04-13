@@ -31,4 +31,11 @@ export class ChallengesService {
       expiresAt: new Date(new Date().getTime() + 5 * 60 * 1000),
     });
   }
+
+  async delete(body: string, userId: string): Promise<void | never> {
+    await this.challengesRepository.delete({
+      body,
+      createdBy: userId,
+    });
+  }
 }

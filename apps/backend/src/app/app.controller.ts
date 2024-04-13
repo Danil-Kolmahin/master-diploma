@@ -94,6 +94,7 @@ export class AppController {
     );
     if (!validChallenge) throw new UnauthorizedException();
 
+    await this.challengesService.delete(challenge, user.id);
     const access_token = await this.authService.signIn(email, projectName);
     res.cookie('SMS_ACCESS_TOKEN', access_token, {
       maxAge: 5 * 60 * 1000,
