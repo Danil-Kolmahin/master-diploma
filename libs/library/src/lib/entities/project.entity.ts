@@ -3,6 +3,6 @@ import { BaseEntity } from './base.entity';
 
 @Entity()
 export class Project extends BaseEntity {
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar' })
   name: string;
 }

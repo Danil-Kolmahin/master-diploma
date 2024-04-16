@@ -7,7 +7,7 @@ import {
   generateKeyPair,
 } from './utils/key-pair';
 import { saveFile } from './utils/file-management';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const Container = styled.div`
   display: flex;
@@ -79,6 +79,7 @@ const Divider = styled.span`
 export const Auth = () => {
   const [email, setEmail] = useState('');
   const [projectName, setProjectName] = useState('');
+  const { inviteToken } = useParams();
   const navigate = useNavigate();
 
   const signIn = useCallback(
@@ -96,11 +97,14 @@ export const Auth = () => {
     async (email: string, projectName: string) => {
       try {
         let keyPair: CryptoKeyPair | null = await generateKeyPair();
-        await axios.post('/sign-up', {
-          email,
-          publicKey: await extractPublicKey(keyPair.publicKey),
-          projectName,
-        });
+        await axios.post(
+          inviteToken ? `/sign-up/from-invite/${inviteToken}` : '/sign-up',
+          {
+            email,
+            publicKey: await extractPublicKey(keyPair.publicKey),
+            projectName,
+          }
+        );
         saveFile(
           await extractPrivateKey(keyPair.privateKey),
           'private_key.pem',
@@ -113,7 +117,7 @@ export const Auth = () => {
         console.error(error);
       }
     },
-    [signIn]
+    [signIn, inviteToken]
   );
 
   return (

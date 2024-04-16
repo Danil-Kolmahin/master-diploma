@@ -8,17 +8,31 @@ import { ProjectsService } from './services/projects.service';
 import { Project } from './entities/project.entity';
 import { Challenge } from './entities/challenge.entity';
 import { ChallengesService } from './services/challenge.service';
+import { Invite } from './entities/invite.entity';
+import { InvitesService } from './services/invites.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Project, Challenge]),
+    TypeOrmModule.forFeature([User, Project, Challenge, Invite]),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '5m' },
     }),
   ],
-  providers: [UsersService, AuthService, ProjectsService, ChallengesService],
-  exports: [UsersService, AuthService, ProjectsService, ChallengesService],
+  providers: [
+    UsersService,
+    AuthService,
+    ProjectsService,
+    ChallengesService,
+    InvitesService,
+  ],
+  exports: [
+    UsersService,
+    AuthService,
+    ProjectsService,
+    ChallengesService,
+    InvitesService,
+  ],
 })
 export class LibraryModule {}

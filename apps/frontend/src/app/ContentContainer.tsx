@@ -75,7 +75,19 @@ export const ContentContainer = () => {
           applications - integrations-bridges
         </SidebarItemLink>
         <SidebarItemLink to="/not-implemented">members</SidebarItemLink>
-        <SidebarItemLink to="/not-implemented">
+        <SidebarItemLink
+          to="/not-implemented"
+          onClick={async () =>
+            console.log(
+              (
+                await axios.post('/invite', {
+                  email: 'test+600@example.com',
+                  projectName: 'p1',
+                })
+              ).data
+            )
+          }
+        >
           roles - permissions
         </SidebarItemLink>
         <SidebarItemLink to="/not-implemented">projects</SidebarItemLink>

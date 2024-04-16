@@ -11,10 +11,10 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', nullable: false, update: false, unique: true })
+  @Column({ type: 'varchar', update: false, unique: true })
   email: string;
 
-  @Column({ type: 'bytea', nullable: false })
+  @Column({ type: 'bytea' })
   publicKey: Buffer;
 
   @CreateDateColumn()

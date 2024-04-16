@@ -7,6 +7,7 @@ import {
   SignInDto,
   SignUpDto,
   UsersService,
+  InvitesService,
 } from '@master-diploma/library';
 import {
   Body,
@@ -17,6 +18,7 @@ import {
   Req,
   Res,
   UnauthorizedException,
+  Param,
 } from '@nestjs/common';
 import { Response } from 'express';
 
@@ -30,7 +32,8 @@ export class AppController {
     private readonly userService: UsersService,
     private readonly authService: AuthService,
     private readonly projectsService: ProjectsService,
-    private readonly challengesService: ChallengesService
+    private readonly challengesService: ChallengesService,
+    private readonly invitesService: InvitesService
   ) {}
 
   @Get('version')
@@ -48,6 +51,7 @@ export class AppController {
     await this.userService.insert(email, publicKey);
     const { id } = await this.userService.findOneByEmail(email);
     await this.projectsService.insert(projectName, id);
+    // TODO: add user to project
   }
 
   @Post('sign-in/challenge-request')
@@ -55,11 +59,12 @@ export class AppController {
     const user = await this.userService.findOneByEmail(email);
     if (!user) throw new UnauthorizedException();
 
-    const project = await this.projectsService.findOneByNameAndUserId(
-      projectName,
-      user.id
-    );
-    if (!project) throw new UnauthorizedException();
+    // TODO: project membership
+    // const project = await this.projectsService.findOneByNameAndUserId(
+    //   projectName,
+    //   user.id
+    // );
+    // if (!project) throw new UnauthorizedException();
 
     const challenge = randomBytes(32).toString('hex');
     await this.challengesService.insert(challenge, user.id);
@@ -82,11 +87,12 @@ export class AppController {
     const user = await this.userService.findOneByEmail(email);
     if (!user) throw new UnauthorizedException();
 
-    const project = await this.projectsService.findOneByNameAndUserId(
-      projectName,
-      user.id
-    );
-    if (!project) throw new UnauthorizedException();
+    // TODO: project membership
+    // const project = await this.projectsService.findOneByNameAndUserId(
+    //   projectName,
+    //   user.id
+    // );
+    // if (!project) throw new UnauthorizedException();
 
     const validChallenge = await this.challengesService.findOneByBodyAndUserId(
       challenge,
@@ -105,6 +111,7 @@ export class AppController {
   }
 
   @Get('logout')
+  @UseGuards(AuthGuard)
   logout(@Res({ passthrough: true }) res: Response) {
     res.cookie('SMS_ACCESS_TOKEN', '', {
       maxAge: 0,
@@ -112,6 +119,38 @@ export class AppController {
       sameSite: 'strict',
       httpOnly: true,
     });
+  }
+
+  @Post('invite')
+  @UseGuards(AuthGuard)
+  async invite(@Req() req, @Body() { projectName, email }: SignInDto) {
+    const inviteToken = randomBytes(32).toString('hex');
+    await this.invitesService.insert(
+      inviteToken,
+      email,
+      projectName,
+      req.user.sub
+    );
+    return `http://localhost:4200/auth/from-invite/${inviteToken}`; // TODO: url
+  }
+
+  @Post('sign-up/from-invite/:inviteToken')
+  async signUpFromInvite(
+    @Param('inviteToken') inviteToken: string,
+    @Body() { projectName, email, publicKey }: SignUpDto
+  ) {
+    const validInvite = await this.invitesService.findOneByBEP(
+      inviteToken,
+      email,
+      projectName
+    );
+
+    if (!validInvite) throw new UnauthorizedException();
+
+    await this.invitesService.delete(email, projectName);
+    await this.userService.insert(email, publicKey);
+    const { id } = await this.userService.findOneByEmail(email);
+    // TODO: add user to project
   }
 
   @Get('profile')
