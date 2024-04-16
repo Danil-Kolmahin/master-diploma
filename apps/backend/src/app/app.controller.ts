@@ -8,6 +8,7 @@ import {
   SignUpDto,
   UsersService,
   InvitesService,
+  CasbinService,
 } from '@master-diploma/library';
 import {
   Body,
@@ -33,7 +34,8 @@ export class AppController {
     private readonly authService: AuthService,
     private readonly projectsService: ProjectsService,
     private readonly challengesService: ChallengesService,
-    private readonly invitesService: InvitesService
+    private readonly invitesService: InvitesService,
+    private readonly casbinService: CasbinService
   ) {}
 
   @Get('version')
@@ -52,6 +54,9 @@ export class AppController {
     const { id } = await this.userService.findOneByEmail(email);
     await this.projectsService.insert(projectName, id);
     // TODO: add user to project
+    console.log(await this.casbinService.enforce(id, 'universe', 'write'));
+    await this.casbinService.addRoleForUser(id, 'root');
+    console.log(await this.casbinService.enforce(id, 'universe', 'write'));
   }
 
   @Post('sign-in/challenge-request')

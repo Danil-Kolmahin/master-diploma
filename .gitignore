@@ -5,6 +5,7 @@ dist
 tmp
 /out-tsc
 .nx/
+rbac_model.conf
 
 # dependencies
 node_modules

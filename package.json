@@ -30,7 +30,8 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
     "tslib": "^2.3.0",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.20",
+    "typeorm-adapter": "^1.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.14.5",

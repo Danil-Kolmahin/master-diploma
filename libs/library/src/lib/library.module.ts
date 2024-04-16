@@ -10,10 +10,12 @@ import { Challenge } from './entities/challenge.entity';
 import { ChallengesService } from './services/challenge.service';
 import { Invite } from './entities/invite.entity';
 import { InvitesService } from './services/invites.service';
+import { CasbinService } from './casbin/casbin.service';
+import { Rule } from './casbin/casbin.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Project, Challenge, Invite]),
+    TypeOrmModule.forFeature([User, Project, Challenge, Invite, Rule]),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
@@ -26,6 +28,7 @@ import { InvitesService } from './services/invites.service';
     ProjectsService,
     ChallengesService,
     InvitesService,
+    CasbinService,
   ],
   exports: [
     UsersService,
@@ -33,6 +36,7 @@ import { InvitesService } from './services/invites.service';
     ProjectsService,
     ChallengesService,
     InvitesService,
+    CasbinService,
   ],
 })
 export class LibraryModule {}
