@@ -30,7 +30,7 @@ import { constants, publicEncrypt, randomBytes } from 'crypto';
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    private readonly userService: UsersService,
+    private readonly usersService: UsersService,
     private readonly authService: AuthService,
     private readonly projectsService: ProjectsService,
     private readonly challengesService: ChallengesService,
@@ -50,29 +50,31 @@ export class AppController {
 
   @Post('sign-up')
   async signUp(@Body() { projectName, email, publicKey }: SignUpDto) {
-    await this.userService.insert(email, publicKey);
-    const { id } = await this.userService.findOneByEmail(email);
-    await this.projectsService.insert(projectName, id);
-    // TODO: add user to project
-    console.log(await this.casbinService.enforce(id, 'universe', 'write'));
-    await this.casbinService.addRoleForUser(id, 'root');
-    console.log(await this.casbinService.enforce(id, 'universe', 'write'));
+    await this.usersService.insert(email, publicKey);
+    const { id: userId } = await this.usersService.findOneByEmail(email);
+
+    await this.projectsService.insert(projectName);
+    const { id: projectId } = await this.projectsService.findOneByName(
+      projectName
+    );
+
+    await this.casbinService.addRoleForUser(userId, 'root', projectId);
   }
 
   @Post('sign-in/challenge-request')
   async signInChallengeRequest(@Body() { projectName, email }: SignInDto) {
-    const user = await this.userService.findOneByEmail(email);
-    if (!user) throw new UnauthorizedException();
+    const user = await this.usersService.findOneByEmail(email);
+    const project = await this.projectsService.findOneByName(projectName);
+    if (!user || !project) throw new UnauthorizedException();
 
-    // TODO: project membership
-    // const project = await this.projectsService.findOneByNameAndUserId(
-    //   projectName,
-    //   user.id
-    // );
-    // if (!project) throw new UnauthorizedException();
+    const hasRoleInProject = await this.casbinService.hasRoleInProject(
+      user.id,
+      project.id
+    );
+    if (!hasRoleInProject) throw new UnauthorizedException();
 
     const challenge = randomBytes(32).toString('hex');
-    await this.challengesService.insert(challenge, user.id);
+    await this.challengesService.insert(challenge);
 
     return publicEncrypt(
       {
@@ -89,23 +91,22 @@ export class AppController {
     @Body() { projectName, email, challenge }: SignInAndVerifyChallengeDto,
     @Res({ passthrough: true }) res: Response
   ) {
-    const user = await this.userService.findOneByEmail(email);
-    if (!user) throw new UnauthorizedException();
+    const user = await this.usersService.findOneByEmail(email);
+    const project = await this.projectsService.findOneByName(projectName);
+    if (!user || !project) throw new UnauthorizedException();
 
-    // TODO: project membership
-    // const project = await this.projectsService.findOneByNameAndUserId(
-    //   projectName,
-    //   user.id
-    // );
-    // if (!project) throw new UnauthorizedException();
+    const hasRoleInProject = await this.casbinService.hasRoleInProject(
+      user.id,
+      project.id
+    );
+    if (!hasRoleInProject) throw new UnauthorizedException();
 
-    const validChallenge = await this.challengesService.findOneByBodyAndUserId(
-      challenge,
-      user.id
+    const validChallenge = await this.challengesService.findOneByBody(
+      challenge
     );
     if (!validChallenge) throw new UnauthorizedException();
 
-    await this.challengesService.delete(challenge, user.id);
+    await this.challengesService.delete(challenge);
     const access_token = await this.authService.signIn(email, projectName);
     res.cookie('SMS_ACCESS_TOKEN', access_token, {
       maxAge: 5 * 60 * 1000,
@@ -128,14 +129,9 @@ export class AppController {
 
   @Post('invite')
   @UseGuards(AuthGuard)
-  async invite(@Req() req, @Body() { projectName, email }: SignInDto) {
+  async invite(@Body() { projectName, email }: SignInDto) {
     const inviteToken = randomBytes(32).toString('hex');
-    await this.invitesService.insert(
-      inviteToken,
-      email,
-      projectName,
-      req.user.sub
-    );
+    await this.invitesService.insert(inviteToken, email, projectName);
     return `http://localhost:4200/auth/from-invite/${inviteToken}`; // TODO: url
   }
 
@@ -149,13 +145,16 @@ export class AppController {
       email,
       projectName
     );
-
     if (!validInvite) throw new UnauthorizedException();
 
     await this.invitesService.delete(email, projectName);
-    await this.userService.insert(email, publicKey);
-    const { id } = await this.userService.findOneByEmail(email);
-    // TODO: add user to project
+    await this.usersService.insert(email, publicKey);
+    const { id: userId } = await this.usersService.findOneByEmail(email);
+    const { id: projectId } = await this.projectsService.findOneByName(
+      projectName
+    );
+
+    await this.casbinService.addRoleForUser(userId, 'root', projectId);
   }
 
   @Get('profile')

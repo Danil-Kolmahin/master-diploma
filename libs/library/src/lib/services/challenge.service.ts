@@ -8,34 +8,23 @@ import { Challenge } from '../entities/challenge.entity';
 export class ChallengesService {
   constructor(
     @InjectRepository(Challenge)
-    private challengesRepository: Repository<Challenge>
+    private readonly challengesRepository: Repository<Challenge>
   ) {}
 
-  findOneByBodyAndUserId(
-    body: string,
-    userId: string
-  ): Promise<Challenge | null> {
+  findOneByBody(body: string): Promise<Challenge | null> {
     return this.challengesRepository.findOne({
-      where: {
-        body,
-        createdBy: userId,
-        expiresAt: MoreThan(new Date()),
-      },
+      where: { body, expiresAt: MoreThan(new Date()) },
     });
   }
 
-  async insert(body: string, userId: string): Promise<void | never> {
+  async insert(body: string): Promise<void | never> {
     await this.challengesRepository.insert({
       body,
-      createdBy: userId,
       expiresAt: new Date(new Date().getTime() + 5 * 60 * 1000),
     });
   }
 
-  async delete(body: string, userId: string): Promise<void | never> {
-    await this.challengesRepository.delete({
-      body,
-      createdBy: userId,
-    });
+  async delete(body: string): Promise<void | never> {
+    await this.challengesRepository.delete({ body });
   }
 }

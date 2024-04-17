@@ -8,7 +8,7 @@ import { Invite } from '../entities/invite.entity';
 export class InvitesService {
   constructor(
     @InjectRepository(Invite)
-    private invitesRepository: Repository<Invite>
+    private readonly invitesRepository: Repository<Invite>
   ) {}
 
   findOneByBEP(
@@ -30,13 +30,11 @@ export class InvitesService {
     body: string,
     email: string,
     projectName: string,
-    inviterId: string
   ): Promise<void | never> {
     await this.invitesRepository.insert({
       body,
       email,
       projectName,
-      createdBy: inviterId,
       expiresAt: new Date(new Date().getTime() + 5 * 60 * 1000),
     });
   }

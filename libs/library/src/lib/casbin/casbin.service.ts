@@ -29,15 +29,51 @@ export class CasbinService implements OnApplicationBootstrap {
     this.enforcer = await newEnforcer('./rbac_model.conf', adapter);
   }
 
-  async enforce(sub: string, obj: string, act: string): Promise<boolean> {
-    return (this.enforcer as Enforcer).enforce(sub, obj, act);
+  async enforce(
+    userId: string,
+    object: string,
+    action: string,
+    projectId: string
+  ): Promise<boolean> {
+    return (this.enforcer as Enforcer).enforce(
+      userId,
+      object,
+      action,
+      projectId
+    );
   }
 
-  async addPolicy(sub: string, obj: string, act: string): Promise<void> {
-    await (this.enforcer as Enforcer).addPolicy(sub, obj, act);
+  async addPolicy(
+    userId: string,
+    object: string,
+    action: string,
+    projectId: string
+  ): Promise<void> {
+    await (this.enforcer as Enforcer).addPolicy(
+      userId,
+      object,
+      action,
+      projectId
+    );
   }
 
-  async addRoleForUser(user: string, role: string): Promise<void> {
-    await (this.enforcer as Enforcer).addRoleForUser(user, role);
+  async addRoleForUser(
+    userId: string,
+    roleName: string,
+    projectId: string
+  ): Promise<void> {
+    await (this.enforcer as Enforcer).addRoleForUser(
+      userId,
+      roleName,
+      projectId
+    );
+  }
+
+  async hasRoleInProject(userId: string, projectId: string): Promise<boolean> {
+    const roles = await (this.enforcer as Enforcer).getRolesForUserInDomain(
+      userId,
+      projectId
+    );
+    return Boolean(roles.length);
   }
 }

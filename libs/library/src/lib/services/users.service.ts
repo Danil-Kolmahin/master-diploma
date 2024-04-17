@@ -8,7 +8,7 @@ import { User } from '../entities/user.entity';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>
+    private readonly usersRepository: Repository<User>
   ) {}
 
   findOneByEmail(email: string): Promise<User | null> {
@@ -17,13 +17,11 @@ export class UsersService {
 
   async insert(email: string, publicKey: string): Promise<void | never> {
     const existingOne = await this.findOneByEmail(email);
-    if (existingOne) {
-      throw new ConflictException();
-    } else {
-      await this.usersRepository.insert({
-        email,
-        publicKey: Buffer.from(publicKey),
-      });
-    }
+    if (existingOne) throw new ConflictException();
+
+    await this.usersRepository.insert({
+      email,
+      publicKey: Buffer.from(publicKey),
+    });
   }
 }

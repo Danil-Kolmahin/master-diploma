@@ -1,5 +1,4 @@
 import {
-  Column,
   CreateDateColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -14,10 +13,4 @@ export abstract class BaseEntity {
 
   @UpdateDateColumn()
   updatedAt?: Date;
-
-  @Column({ update: false })
-  createdBy: string;
-
-  @Column({ nullable: true })
-  updatedBy?: string;
 }

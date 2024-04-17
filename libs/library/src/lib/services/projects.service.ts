@@ -8,27 +8,17 @@ import { Project } from '../entities/project.entity';
 export class ProjectsService {
   constructor(
     @InjectRepository(Project)
-    private projectsRepository: Repository<Project>
+    private readonly projectsRepository: Repository<Project>
   ) {}
 
-  findOneByNameAndUserId(
-    name: string,
-    userId: string
-  ): Promise<Project | null> {
-    return this.projectsRepository.findOneBy({ name, createdBy: userId });
+  findOneByName(name: string): Promise<Project | null> {
+    return this.projectsRepository.findOneBy({ name });
   }
 
-  async insert(name: string, userId: string): Promise<void | never> {
-    const existingOne = await this.projectsRepository.findOneBy({
-      createdBy: userId,
-    });
-    if (existingOne) {
-      throw new ConflictException();
-    } else {
-      await this.projectsRepository.insert({
-        name,
-        createdBy: userId,
-      });
-    }
+  async insert(name: string): Promise<void | never> {
+    const existingOne = await this.findOneByName(name);
+    if (existingOne) throw new ConflictException();
+
+    await this.projectsRepository.insert({ name });
   }
 }

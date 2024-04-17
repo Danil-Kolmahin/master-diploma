@@ -17,6 +17,7 @@
     "ms-vscode-remote.remote-ssh",
     "pmneo.tsimporter",
     "technosophos.vscode-helm",
-    "redhat.vscode-yaml"
+    "redhat.vscode-yaml",
+    "ckolkman.vscode-postgres"
   ]
 }
