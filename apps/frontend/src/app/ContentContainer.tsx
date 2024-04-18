@@ -71,7 +71,21 @@ export const ContentContainer = () => {
         <SidebarItem>{projectName}</SidebarItem>
         <hr />
         <SidebarItemLink to="/">namespaces - secrets-variables</SidebarItemLink>
-        <SidebarItemLink to="/not-implemented">
+        <SidebarItemLink
+          to="/not-implemented"
+          onClick={async () => {
+            await axios.post('/namespaces', { name: 'n2' });
+            const namespaces = (await axios('/namespaces/all')).data;
+            await axios.post('/secrets', {
+              name: 's1',
+              encryptedValue: 'test',
+              namespaceId: namespaces[0].id,
+            });
+
+            console.log((await axios(`/secrets/all/${namespaces[0].id}`)).data);
+            console.log((await axios(`/secrets/all/${namespaces[1].id}`)).data);
+          }}
+        >
           applications - integrations-bridges
         </SidebarItemLink>
         <SidebarItemLink to="/not-implemented">members</SidebarItemLink>

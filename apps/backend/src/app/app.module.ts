@@ -5,6 +5,9 @@ import { LibraryModule } from '@master-diploma/library';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthController } from './controllers/auth.controller';
+import { NamespacesController } from './controllers/namespaces.controller';
+import { SecretsController } from './controllers/secrets.controller';
 
 @Module({
   imports: [
@@ -19,7 +22,12 @@ import { AppService } from './app.service';
       autoLoadEntities: true,
     }),
   ],
-  controllers: [AppController],
+  controllers: [
+    AppController,
+    AuthController,
+    NamespacesController,
+    SecretsController,
+  ],
   providers: [AppService],
 })
 export class AppModule {}
