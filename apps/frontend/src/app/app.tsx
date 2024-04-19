@@ -16,6 +16,10 @@ const GlobalStyle = css`
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+
+    font-family: 'Courier', monospace;
+    font-size: 12px;
+    font-weight: 400;
   }
 
   html,
@@ -26,9 +30,6 @@ const GlobalStyle = css`
 `;
 
 const StyledApp = styled.div`
-  font-family: 'Courier', monospace;
-  font-size: 12px;
-  font-weight: 400;
   display: table;
   width: 100%;
   height: 100vh;

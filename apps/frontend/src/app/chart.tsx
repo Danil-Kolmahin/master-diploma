@@ -1,97 +1,48 @@
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
-import HighchartsAccessibility from 'highcharts/modules/accessibility.js';
-import HighchartsVenn from 'highcharts/modules/venn.js';
+import styled from '@emotion/styled';
+import Plot from 'react-plotly.js';
 
-HighchartsAccessibility(Highcharts);
-HighchartsVenn(Highcharts);
-
-const options = {
-  title: { text: '' },
-  credits: { enabled: false },
-  tooltip: {
-    headerFormat:
-      '<span style="color:{point.color}">\u2022</span><span style="font-size: 14px"> {point.point.name}</span><br/>',
-    pointFormat: '{point.longDescription}',
-  },
-  series: [
-    {
-      type: 'venn',
-      data: [
-        {
-          sets: ['local'],
-          value: 100,
-          longDescription: 'PORT=8090\nPV_KEY=test',
-        },
-        {
-          sets: ['qa'],
-          value: 100,
-        },
-        {
-          sets: ['prod'],
-          value: 100,
-        },
-        {
-          sets: ['local', 'qa'],
-          value: 50,
-        },
-        {
-          sets: ['qa', 'prod'],
-          value: 50,
-        },
-        {
-          sets: ['prod', 'local'],
-          value: 50,
-        },
-        {
-          sets: ['local', 'qa', 'prod'],
-          value: 50,
-        },
-        {
-          sets: ['dev1'],
-          value: 10,
-        },
-        {
-          sets: ['dev2'],
-          value: 10,
-        },
-        {
-          sets: ['dev3'],
-          value: 10,
-        },
-        {
-          sets: ['local', 'dev1'],
-          value: 10,
-        },
-        {
-          sets: ['local', 'dev2'],
-          value: 10,
-        },
-        {
-          sets: ['local', 'dev3'],
-          value: 10,
-        },
-        {
-          sets: ['dev1', 'dev2'],
-          value: 5,
-        },
-        {
-          sets: ['dev2', 'dev3'],
-          value: 5,
-        },
-        {
-          sets: ['dev3', 'dev1'],
-          value: 5,
-        },
-        {
-          sets: ['dev1', 'dev2', 'dev3'],
-          value: 5,
-        },
-      ],
-    },
-  ],
-};
+const PlotContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 export const Chart = () => {
-  return <HighchartsReact highcharts={Highcharts} options={options} />;
+  return (
+    <PlotContainer>
+      <Plot
+        data={[
+          {
+            type: 'treemap',
+            labels: [
+              'namespace1',
+              'namespace2',
+              'namespace3',
+              'namespace4',
+              'namespace5',
+            ],
+            parents: ['', 'namespace1', 'namespace1', 'namespace2', ''],
+            text: [
+              'APP_PORT1, APP_PORT1, APP_PORT1, APP_PORT1, APP_PORT1',
+              'APP_PORT2, APP_PORT2, APP_PORT2, APP_PORT2, APP_PORT2',
+              'APP_PORT3, APP_PORT3, APP_PORT3, APP_PORT3, APP_PORT3',
+              'APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4',
+              'APP_PORT5, APP_PORT5, APP_PORT5, APP_PORT5, APP_PORT5',
+            ],
+            textinfo: 'label+text',
+          },
+        ]}
+        layout={{
+          modebar: { remove: ['toImage'] },
+          colorway: ['lightgray', 'gray', 'darkgray'],
+          margin: { t: 0, b: 0, l: 0, r: 0, pad: 0 },
+        }}
+        config={{ displaylogo: false }}
+        useResizeHandler={true}
+        style={{ width: '80%', height: '80%' }}
+      />
+    </PlotContainer>
+  );
 };

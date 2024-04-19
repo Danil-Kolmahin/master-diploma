@@ -35,10 +35,6 @@ const Box = styled.div`
 `;
 
 const KeyButton = styled.label`
-  font-family: 'Courier', monospace;
-  font-size: 12px;
-  font-weight: 400;
-
   border: none;
   background: none;
   color: black;

@@ -56,10 +56,6 @@ const ButtonGroup = styled.div`
 `;
 
 const Button = styled.button`
-  font-family: 'Courier', monospace;
-  font-size: 12px;
-  font-weight: 400;
-
   border: none;
   background: none;
   cursor: pointer;
