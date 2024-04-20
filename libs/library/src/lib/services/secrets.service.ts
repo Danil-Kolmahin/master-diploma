@@ -16,7 +16,7 @@ export class SecretsService {
 
   async insert(
     name: string,
-    encryptedValue: Buffer,
+    encryptedValue: string,
     projectId: string,
     namespaceId: string
   ): Promise<void | never> {

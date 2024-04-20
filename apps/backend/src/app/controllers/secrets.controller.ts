@@ -29,7 +29,7 @@ export class SecretsController {
   ) {
     await this.secretsService.insert(
       name,
-      Buffer.from(encryptedValue),
+      encryptedValue,
       (req as any).user.projectId,
       namespaceId
     );

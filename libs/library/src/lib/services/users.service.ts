@@ -19,9 +19,6 @@ export class UsersService {
     const existingOne = await this.findOneByEmail(email);
     if (existingOne) throw new ConflictException();
 
-    await this.usersRepository.insert({
-      email,
-      publicKey: Buffer.from(publicKey),
-    });
+    await this.usersRepository.insert({ email, publicKey });
   }
 }

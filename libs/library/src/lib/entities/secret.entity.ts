@@ -2,13 +2,13 @@ import { Column, Entity, Index } from 'typeorm';
 import { BaseEntity } from './base.entity';
 
 @Entity()
-@Index(['name', 'projectId'], { unique: true })
+@Index(['name', 'namespaceId'], { unique: true })
 export class Secret extends BaseEntity {
   @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ type: 'bytea' })
-  encryptedValue: Buffer;
+  @Column({ type: 'varchar' })
+  encryptedValue: string;
 
   @Column({ type: 'varchar' })
   namespaceId: string;

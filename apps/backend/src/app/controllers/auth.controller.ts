@@ -65,7 +65,7 @@ export class AuthController {
 
     return publicEncrypt(
       {
-        key: user.publicKey,
+        key: Buffer.from(user.publicKey),
         padding: constants.RSA_PKCS1_OAEP_PADDING,
         oaepHash: 'sha256',
       },

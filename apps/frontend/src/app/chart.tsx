@@ -25,18 +25,18 @@ export const Chart = () => {
             ],
             parents: ['', 'namespace1', 'namespace1', 'namespace2', ''],
             text: [
-              'APP_PORT1, APP_PORT1, APP_PORT1, APP_PORT1, APP_PORT1',
-              'APP_PORT2, APP_PORT2, APP_PORT2, APP_PORT2, APP_PORT2',
-              'APP_PORT3, APP_PORT3, APP_PORT3, APP_PORT3, APP_PORT3',
-              'APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4 APP_PORT4<br />APP_PORT4',
-              'APP_PORT5, APP_PORT5, APP_PORT5, APP_PORT5, APP_PORT5',
+              'APP_PORT1 APP_PORT1<br>APP_PORT1 APP_PORT1<br>APP_PORT1',
+              'APP_PORT2 APP_PORT2<br>APP_PORT2 APP_PORT2<br>APP_PORT2',
+              'APP_PORT3 APP_PORT3<br>APP_PORT3 APP_PORT3<br>APP_PORT3',
+              'APP_PORT4 APP_PORT4<br>APP_PORT4 APP_PORT4<br>APP_PORT4',
+              'APP_PORT5 APP_PORT5<br>APP_PORT5 APP_PORT5<br>APP_PORT5',
             ],
             textinfo: 'label+text',
           },
         ]}
         layout={{
           modebar: { remove: ['toImage'] },
-          colorway: ['lightgray', 'gray', 'darkgray'],
+          colorway: ['lightgray', 'darkblue', 'gray', 'blue', 'darkgray'],
           margin: { t: 0, b: 0, l: 0, r: 0, pad: 0 },
         }}
         config={{ displaylogo: false }}
