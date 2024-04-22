@@ -8,6 +8,7 @@ import { Route, Routes } from 'react-router-dom';
 import { ContentContainer } from './ContentContainer';
 import axios from 'axios';
 import { NamespacesSecrets } from './NamespacesSecrets';
+import { ProjectMembers } from './ProjectMembers';
 
 axios.defaults.baseURL = 'http://localhost:3001';
 
@@ -50,6 +51,7 @@ export const App = () => {
           <Route element={<ContentContainer />}>
             <Route path="/" element={<Chart />} />
             <Route path="/namespaces-secrets" element={<NamespacesSecrets />} />
+            <Route path="/project-members" element={<ProjectMembers />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

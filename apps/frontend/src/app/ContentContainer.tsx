@@ -75,21 +75,7 @@ export const ContentContainer = () => {
           namespaces-secrets
         </SidebarItemLink>
         <SidebarItemLink to="/roles-polices">roles-polices</SidebarItemLink>
-        <SidebarItemLink
-          to="/project-members"
-          onClick={async () =>
-            console.log(
-              (
-                await axios.post('/invite', {
-                  email: 'test+600@example.com',
-                  projectName: 'p1',
-                })
-              ).data
-            )
-          }
-        >
-          project-members
-        </SidebarItemLink>
+        <SidebarItemLink to="/project-members">project-members</SidebarItemLink>
         <SidebarItemLink
           to="/auth"
           onClick={() => {
@@ -101,7 +87,7 @@ export const ContentContainer = () => {
         </SidebarItemLink>
       </Sidebar>
       <Content>
-        <Outlet />
+        <Outlet context={{ email, projectName }} />
       </Content>
     </>
   );

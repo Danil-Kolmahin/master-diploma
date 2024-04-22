@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Any, Repository } from 'typeorm';
 
 import { User } from '../entities/user.entity';
 
@@ -13,6 +13,10 @@ export class UsersService {
 
   findOneByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ email });
+  }
+
+  findByIds(ids: string[]): Promise<User[]> {
+    return this.usersRepository.find({ where: { id: Any(ids) } });
   }
 
   async insert(email: string, publicKey: string): Promise<void | never> {

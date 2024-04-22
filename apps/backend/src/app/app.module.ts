@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 import { AuthController } from './controllers/auth.controller';
 import { NamespacesController } from './controllers/namespaces.controller';
 import { SecretsController } from './controllers/secrets.controller';
+import { PermissionsController } from './controllers/permissions.controller';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { SecretsController } from './controllers/secrets.controller';
     AuthController,
     NamespacesController,
     SecretsController,
+    PermissionsController,
   ],
   providers: [AppService],
 })

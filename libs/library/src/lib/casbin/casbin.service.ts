@@ -5,10 +5,14 @@ import { Rule } from './casbin.entity';
 import { DataSource } from 'typeorm';
 import { writeFile } from 'fs/promises';
 import model from './rbac.model';
+import { User } from '../entities/user.entity';
+import { UsersService } from '../services/users.service';
 
 @Injectable()
 export class CasbinService implements OnApplicationBootstrap {
   private enforcer?: Enforcer;
+
+  constructor(private readonly usersService: UsersService) {}
 
   async onApplicationBootstrap() {
     const dataSource = new DataSource({
@@ -75,5 +79,15 @@ export class CasbinService implements OnApplicationBootstrap {
       projectId
     );
     return Boolean(roles.length);
+  }
+
+  async findUsersInProject(projectId: string): Promise<User[]> {
+    const groupingPolicies = await (
+      this.enforcer as Enforcer
+    ).getFilteredGroupingPolicy(2, projectId);
+
+    const presumingUserIds = [...groupingPolicies.map(([id]) => id)];
+
+    return this.usersService.findByIds(presumingUserIds);
   }
 }
