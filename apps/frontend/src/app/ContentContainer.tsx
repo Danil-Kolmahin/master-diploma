@@ -74,7 +74,7 @@ export const ContentContainer = () => {
         <SidebarItemLink to="/namespaces-secrets">
           namespaces-secrets
         </SidebarItemLink>
-        <SidebarItemLink to="/roles-polices">roles-polices</SidebarItemLink>
+        <SidebarItemLink to="/roles-policies">roles-policies</SidebarItemLink>
         <SidebarItemLink to="/project-members">project-members</SidebarItemLink>
         <SidebarItemLink
           to="/auth"

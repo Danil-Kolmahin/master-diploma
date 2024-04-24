@@ -9,6 +9,8 @@ import { ContentContainer } from './ContentContainer';
 import axios from 'axios';
 import { NamespacesSecrets } from './NamespacesSecrets';
 import { ProjectMembers } from './ProjectMembers';
+import { RolesPolicies } from './RolesPolicies';
+import { Role } from './Role';
 
 axios.defaults.baseURL = 'http://localhost:3001';
 
@@ -51,6 +53,8 @@ export const App = () => {
           <Route element={<ContentContainer />}>
             <Route path="/" element={<Chart />} />
             <Route path="/namespaces-secrets" element={<NamespacesSecrets />} />
+            <Route path="/roles-policies" element={<RolesPolicies />} />
+            <Route path="/roles-policies/:roleName" element={<Role />} />
             <Route path="/project-members" element={<ProjectMembers />} />
           </Route>
           <Route path="*" element={<NotFound />} />

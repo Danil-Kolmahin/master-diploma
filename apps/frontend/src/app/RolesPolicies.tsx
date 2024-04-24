@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const PlotContainer = styled.div`
   width: 100%;
@@ -57,18 +57,15 @@ const SecretNameText = styled(SecretText)`
   font-weight: bold;
 `;
 
-export const ProjectMembers = () => {
-  const [data, setData] = useState<any>([]);
+export const RolesPolicies = () => {
+  const [data, setData] = useState<string[]>([]);
   const [newNamespaceName, setNewNamespaceName] = useState('');
-  const { projectName } = useOutletContext<{
-    email: string;
-    projectName: string;
-  }>();
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get('/members');
+        const response = await axios.get('/roles');
         setData(response.data);
       } catch (error) {
         console.log(error);
@@ -78,11 +75,10 @@ export const ProjectMembers = () => {
 
   return (
     <PlotContainer>
-      {data.map((user: any) => (
-        <SecretTextDiv key={user.id}>
+      {data.map((role: string) => (
+        <SecretTextDiv key={role}>
           <SecretText>
-            <SecretNameText>{user.email}</SecretNameText> | {'root'} |{' '}
-            {user.createdAt}
+            <SecretNameText>{role}</SecretNameText>
           </SecretText>
         </SecretTextDiv>
       ))}
@@ -90,20 +86,11 @@ export const ProjectMembers = () => {
         <NamespaceNameInput
           value={newNamespaceName}
           onChange={(e) => setNewNamespaceName(e.target.value)}
-          placeholder="email"
-          type="email"
+          placeholder="role name"
+          type="text"
         />
-        <Button
-          onClick={async () => {
-            const { data: link } = await axios.post('/invite', {
-              email: newNamespaceName,
-              projectName,
-            });
-            await navigator.clipboard.writeText(link);
-            alert(`invite link: ${link}`);
-          }}
-        >
-          invite
+        <Button onClick={() => navigate(`/roles-policies/${newNamespaceName}`)}>
+          create
         </Button>
       </NamespaceBlock>
     </PlotContainer>

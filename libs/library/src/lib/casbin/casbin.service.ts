@@ -47,20 +47,6 @@ export class CasbinService implements OnApplicationBootstrap {
     );
   }
 
-  async addPolicy(
-    userId: string,
-    object: string,
-    action: string,
-    projectId: string
-  ): Promise<void> {
-    await (this.enforcer as Enforcer).addPolicy(
-      userId,
-      object,
-      action,
-      projectId
-    );
-  }
-
   async addRoleForUser(
     userId: string,
     roleName: string,
@@ -89,5 +75,43 @@ export class CasbinService implements OnApplicationBootstrap {
     const presumingUserIds = [...groupingPolicies.map(([id]) => id)];
 
     return this.usersService.findByIds(presumingUserIds);
+  }
+
+  async getAllRolesNames(projectId: string): Promise<string[]> {
+    const policies = await (this.enforcer as Enforcer).getFilteredPolicy(
+      3,
+      projectId
+    );
+
+    const presumingRoles = [...new Set(policies.map(([id]) => id))];
+
+    return [...presumingRoles, 'root'];
+  }
+
+  async addRole(
+    roleName: string,
+    projectId: string,
+    policies: string[][]
+  ): Promise<void> {
+    for (const [object, action] of policies) {
+      await (this.enforcer as Enforcer).addPolicy(
+        roleName,
+        object,
+        action,
+        projectId
+      );
+    }
+  }
+
+  async findRoleByName(roleName: string, projectId: string): Promise<string[][]> {
+    const policies = await (this.enforcer as Enforcer).getFilteredPolicy(
+      0,
+      roleName,
+      '',
+      '',
+      projectId
+    );
+
+    return policies.map(([, object, action]) => [object, action]);
   }
 }
