@@ -60,6 +60,7 @@ const SecretNameText = styled(SecretText)`
 export const ProjectMembers = () => {
   const [data, setData] = useState<any>([]);
   const [newNamespaceName, setNewNamespaceName] = useState('');
+  const [roleName, setRoleName] = useState('');
   const { projectName } = useOutletContext<{
     email: string;
     projectName: string;
@@ -81,7 +82,7 @@ export const ProjectMembers = () => {
       {data.map((user: any) => (
         <SecretTextDiv key={user.id}>
           <SecretText>
-            <SecretNameText>{user.email}</SecretNameText> | {'root'} |{' '}
+            <SecretNameText>{user.email}</SecretNameText> | {user.roleName} |{' '}
             {user.createdAt}
           </SecretText>
         </SecretTextDiv>
@@ -93,11 +94,18 @@ export const ProjectMembers = () => {
           placeholder="email"
           type="email"
         />
+        <NamespaceNameInput
+          value={roleName}
+          onChange={(e) => setRoleName(e.target.value)}
+          placeholder="role"
+          type="text"
+        />
         <Button
           onClick={async () => {
             const { data: link } = await axios.post('/invite', {
               email: newNamespaceName,
               projectName,
+              roleName,
             });
             await navigator.clipboard.writeText(link);
             alert(`invite link: ${link}`);

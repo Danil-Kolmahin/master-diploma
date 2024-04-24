@@ -23,6 +23,7 @@ import {
 import { Response } from 'express';
 
 import { constants, publicEncrypt, randomBytes } from 'crypto';
+import { InviteDto } from '../dto/invite.dto';
 
 @Controller()
 export class AuthController {
@@ -116,9 +117,9 @@ export class AuthController {
 
   @Post('invite')
   @UseGuards(AuthGuard)
-  async invite(@Body() { projectName, email }: SignInDto) {
+  async invite(@Body() { projectName, email, roleName }: InviteDto) {
     const inviteToken = randomBytes(32).toString('hex');
-    await this.invitesService.insert(inviteToken, email, projectName);
+    await this.invitesService.insert(inviteToken, email, roleName, projectName);
     return `http://localhost:4200/auth/from-invite/${inviteToken}`; // TODO: url
   }
 
@@ -141,6 +142,10 @@ export class AuthController {
       projectName
     );
 
-    await this.casbinService.addRoleForUser(userId, 'root', projectId);
+    await this.casbinService.addRoleForUser(
+      userId,
+      validInvite.roleName,
+      projectId
+    );
   }
 }

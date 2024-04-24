@@ -74,7 +74,14 @@ export class CasbinService implements OnApplicationBootstrap {
 
     const presumingUserIds = [...groupingPolicies.map(([id]) => id)];
 
-    return this.usersService.findByIds(presumingUserIds);
+    const users = await this.usersService.findByIds(presumingUserIds);
+
+    const enrichedUser = users.map((u) => ({
+      ...u,
+      roleName: (groupingPolicies.find(([id]) => id === u.id) as string[])[1],
+    }));
+
+    return enrichedUser;
   }
 
   async getAllRolesNames(projectId: string): Promise<string[]> {
@@ -103,7 +110,10 @@ export class CasbinService implements OnApplicationBootstrap {
     }
   }
 
-  async findRoleByName(roleName: string, projectId: string): Promise<string[][]> {
+  async findRoleByName(
+    roleName: string,
+    projectId: string
+  ): Promise<string[][]> {
     const policies = await (this.enforcer as Enforcer).getFilteredPolicy(
       0,
       roleName,
