@@ -61,10 +61,7 @@ export const ProjectMembers = () => {
   const [data, setData] = useState<any>([]);
   const [newNamespaceName, setNewNamespaceName] = useState('');
   const [roleName, setRoleName] = useState('');
-  const { projectName } = useOutletContext<{
-    email: string;
-    projectName: string;
-  }>();
+  const { projectName } = useOutletContext<{ projectName: string }>();
 
   useEffect(() => {
     (async () => {

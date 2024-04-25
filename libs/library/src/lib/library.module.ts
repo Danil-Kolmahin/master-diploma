@@ -16,6 +16,8 @@ import { Namespace } from './entities/namespace.entity';
 import { Secret } from './entities/secret.entity';
 import { NamespacesService } from './services/namespaces.service';
 import { SecretsService } from './services/secrets.service';
+import { SecurityKey } from './entities/security-key.entity';
+import { SecurityKeysService } from './services/security-key.service';
 
 @Module({
   imports: [
@@ -27,6 +29,7 @@ import { SecretsService } from './services/secrets.service';
       Rule,
       Namespace,
       Secret,
+      SecurityKey,
     ]),
     JwtModule.register({
       global: true,
@@ -43,6 +46,7 @@ import { SecretsService } from './services/secrets.service';
     CasbinService,
     NamespacesService,
     SecretsService,
+    SecurityKeysService,
   ],
   exports: [
     UsersService,
@@ -53,6 +57,7 @@ import { SecretsService } from './services/secrets.service';
     CasbinService,
     NamespacesService,
     SecretsService,
+    SecurityKeysService,
   ],
 })
 export class LibraryModule {}

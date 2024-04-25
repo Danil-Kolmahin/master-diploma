@@ -14,6 +14,10 @@ export class NamespacesService {
     return this.namespacesRepository.find({ where: { projectId } });
   }
 
+  findOne(name: string, projectId: string): Promise<Namespace | null> {
+    return this.namespacesRepository.findOneBy({ name, projectId });
+  }
+
   async insert(
     name: string,
     projectId: string,

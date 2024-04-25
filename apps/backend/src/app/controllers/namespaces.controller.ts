@@ -2,6 +2,7 @@ import {
   AuthGuard,
   CasbinService,
   NamespacesService,
+  SecurityKeysService,
 } from '@master-diploma/library';
 import { Body, Controller, Post, UseGuards, Req, Get } from '@nestjs/common';
 import { Request } from 'express';
@@ -11,7 +12,8 @@ import { NamespaceDto } from '../dto/namespace.dto';
 export class NamespacesController {
   constructor(
     private readonly namespacesService: NamespacesService,
-    private readonly casbinService: CasbinService
+    private readonly casbinService: CasbinService,
+    private readonly securityKeysService: SecurityKeysService
   ) {}
 
   @Get('all')
@@ -37,16 +39,39 @@ export class NamespacesController {
     for (let i = 0; i < namespaces.length; i++)
       if (rights[i]) result.push(namespaces[i]);
 
-    return result;
+    const securityKeys = await this.securityKeysService.findByProjectId(
+      (req as any).user.sub,
+      (req as any).user.projectId
+    );
+
+    return result.map((n) => ({
+      ...n,
+      encryptedSecurityKey: (securityKeys.find((k) => k.entityId === n.id))?.encryptedKey,
+    }));
   }
 
   @Post()
   @UseGuards(AuthGuard)
-  async insert(@Req() req: Request, @Body() { name, parentId }: NamespaceDto) {
+  async insert(
+    @Req() req: Request,
+    @Body() { name, parentId, encryptedSecurityKey }: NamespaceDto
+  ) {
     await this.namespacesService.insert(
       name,
       (req as any).user.projectId,
       parentId
+    );
+
+    const namespace = await this.namespacesService.findOne(
+      name,
+      (req as any).user.projectId
+    );
+
+    await this.securityKeysService.insert(
+      (req as any).user.sub,
+      (req as any).user.projectId,
+      namespace?.id,
+      encryptedSecurityKey
     );
   }
 }

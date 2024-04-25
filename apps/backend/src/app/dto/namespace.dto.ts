@@ -7,4 +7,7 @@ export class NamespaceDto {
   @IsUUID(4)
   @IsOptional()
   parentId?: string;
+
+  @IsString()
+  encryptedSecurityKey: string;
 }

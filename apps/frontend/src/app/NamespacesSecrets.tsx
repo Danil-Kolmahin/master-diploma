@@ -1,6 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import styled from '@emotion/styled';
+import {
+  decryptData,
+  decryptSymmetricKey,
+  encryptData,
+  encryptSymmetricKey,
+  generateSymmetricKey,
+  getPublicKeyFromString,
+} from './utils/key-pair';
+import { useOutletContext } from 'react-router-dom';
+import { getFromDB } from './utils/indexed-db';
 
 const NamespacePath = styled.span`
   font-size: 18px;
@@ -72,6 +82,57 @@ export const NamespacesSecrets = () => {
   const [data, setData] = useState<any>([]);
   const [inputs, setInputs] = useState({});
   const [newNamespaceName, setNewNamespaceName] = useState('');
+  const { publicKey } = useOutletContext<{ publicKey: string }>();
+  const [decryptedSecrets, setDecryptedSecrets] = useState<{
+    [key: string]: string;
+  }>({});
+
+  const createNamespace = useCallback(
+    async (name: string, publicKey: string, parentId?: string) => {
+      const symmetricKey = await generateSymmetricKey();
+      const encryptedSecurityKey = await encryptSymmetricKey(
+        symmetricKey,
+        await getPublicKeyFromString(publicKey)
+      );
+      await axios.post('/namespaces', { name, encryptedSecurityKey, parentId });
+    },
+    []
+  );
+
+  const createSecret = useCallback(
+    async (
+      name: string,
+      data: string,
+      namespaceId: string,
+      encryptedSecurityKey: string
+    ) => {
+      const symmetricKey = await decryptSymmetricKey(
+        encryptedSecurityKey,
+        await getFromDB()
+      );
+      const encryptedValue = await encryptData(data, symmetricKey);
+      await axios.post('/secrets', { name, encryptedValue, namespaceId });
+    },
+    []
+  );
+
+  const decryptAndShowSecret = useCallback(
+    async (
+      encryptedValue: string,
+      encryptedSecurityKey: string,
+      secretId: string
+    ) => {
+      if (decryptedSecrets[secretId]) return;
+
+      const symmetricKey = await decryptSymmetricKey(
+        encryptedSecurityKey,
+        await getFromDB()
+      );
+      const decryptedValue = await decryptData(encryptedValue, symmetricKey);
+      setDecryptedSecrets((prev) => ({ ...prev, [secretId]: decryptedValue }));
+    },
+    [decryptedSecrets]
+  );
 
   const renderNamespace = useCallback(
     (namespace: any, level: number, path: string) => {
@@ -82,18 +143,20 @@ export const NamespacesSecrets = () => {
         }));
       };
 
-      const handleCreateNamespace = (namespaceId: any) =>
-        axios.post('/namespaces', {
-          name: (inputs as any)[namespaceId]?.name,
-          parentId: namespaceId,
-        });
+      const handleCreateNamespace = (namespaceId: string) =>
+        createNamespace(
+          (inputs as any)[namespaceId]?.name,
+          publicKey,
+          namespaceId
+        );
 
-      const handleCreateSecret = (namespaceId: any) =>
-        axios.post('/secrets', {
-          name: (inputs as any)[namespaceId]?.name,
-          encryptedValue: (inputs as any)[namespaceId]?.value,
+      const handleCreateSecret = (namespaceId: string) =>
+        createSecret(
+          (inputs as any)[namespaceId]?.name,
+          (inputs as any)[namespaceId]?.value,
           namespaceId,
-        });
+          namespace.encryptedSecurityKey
+        );
 
       return (
         <div key={namespace.id}>
@@ -104,9 +167,18 @@ export const NamespacesSecrets = () => {
           <IndentDiv level={level}>
             {namespace.secrets.map((secret: any) => (
               <SecretTextDiv key={secret.id}>
-                <SecretText>
+                <SecretText
+                  onClick={() =>
+                    decryptAndShowSecret(
+                      secret.encryptedValue,
+                      namespace.encryptedSecurityKey,
+                      secret.id
+                    )
+                  }
+                >
                   <SecretNameText>{secret.name}</SecretNameText> |{' '}
-                  {secret.encryptedValue} | {secret.createdAt}
+                  {decryptedSecrets[secret.id] || secret.encryptedValue} |{' '}
+                  {secret.createdAt}
                 </SecretText>
               </SecretTextDiv>
             ))}
@@ -139,7 +211,15 @@ export const NamespacesSecrets = () => {
         </div>
       );
     },
-    [inputs, setInputs]
+    [
+      inputs,
+      setInputs,
+      publicKey,
+      createNamespace,
+      createSecret,
+      decryptedSecrets,
+      decryptAndShowSecret,
+    ]
   );
 
   useEffect(() => {
@@ -193,9 +273,7 @@ export const NamespacesSecrets = () => {
           onChange={(e) => setNewNamespaceName(e.target.value)}
           placeholder="name"
         />
-        <Button
-          onClick={() => axios.post('/namespaces', { name: newNamespaceName })}
-        >
+        <Button onClick={() => createNamespace(newNamespaceName, publicKey)}>
           add namespace
         </Button>
       </NamespaceBlock>

@@ -49,15 +49,13 @@ const SidebarItemLink = styled(NavLink)`
 
 export const ContentContainer = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [projectName, setProjectName] = useState('');
+  const [data, setData] = useState({});
 
   useEffect(() => {
     (async () => {
       try {
         const response = await axios.get('/profile');
-        setEmail(response.data.email);
-        setProjectName(response.data.projectName);
+        setData(response.data);
       } catch (error) {
         if (isAxiosError(error)) navigate('/auth');
       }
@@ -67,8 +65,8 @@ export const ContentContainer = () => {
   return (
     <>
       <Sidebar>
-        <SidebarItem>{email}</SidebarItem>
-        <SidebarItem>{projectName}</SidebarItem>
+        <SidebarItem>{(data as any).email}</SidebarItem>
+        <SidebarItem>{(data as any).projectName}</SidebarItem>
         <hr />
         <SidebarItemLink to="/">dashboard</SidebarItemLink>
         <SidebarItemLink to="/namespaces-secrets">
@@ -87,7 +85,7 @@ export const ContentContainer = () => {
         </SidebarItemLink>
       </Sidebar>
       <Content>
-        <Outlet context={{ email, projectName }} />
+        <Outlet context={data} />
       </Content>
     </>
   );

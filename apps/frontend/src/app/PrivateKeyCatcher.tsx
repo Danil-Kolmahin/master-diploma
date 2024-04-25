@@ -2,7 +2,7 @@ import { ChangeEvent, useCallback, DragEvent } from 'react';
 import styled from '@emotion/styled';
 import axios from 'axios';
 import { getTextFromFile } from './utils/file-management';
-import { getPrivateKeyFromFile } from './utils/key-pair';
+import { getPrivateKeyFromString } from './utils/key-pair';
 import { getFromDB, saveToDB } from './utils/indexed-db';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -57,7 +57,7 @@ export const PrivateKeyCatcher = () => {
         const file = fileList.item(0) as File;
         if (file.name.slice(-4) !== '.pem') return;
         const fileText = await getTextFromFile(file);
-        const privateKey = await getPrivateKeyFromFile(fileText);
+        const privateKey = await getPrivateKeyFromString(fileText);
         saveToDB(privateKey);
 
         const encryptedChallenge = (
