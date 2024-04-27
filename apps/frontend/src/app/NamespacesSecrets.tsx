@@ -226,12 +226,7 @@ export const NamespacesSecrets = () => {
     (async () => {
       try {
         const namespaces = (await axios('/namespaces/all')).data;
-        const secretsResult = await Promise.all(
-          namespaces.map((namespace: any) =>
-            axios(`/secrets/all/${namespace.id}`)
-          )
-        );
-        const secrets = secretsResult.map(({ data }) => data).flat();
+        const secrets = (await axios('/secrets/all')).data;
 
         const namespaceMap: any = new Map(
           namespaces.map((ns: any) => [
@@ -240,7 +235,7 @@ export const NamespacesSecrets = () => {
           ])
         );
 
-        secrets.forEach((secret) => {
+        secrets.forEach((secret: any) => {
           if (namespaceMap.has(secret.namespaceId))
             namespaceMap.get(secret.namespaceId).secrets.push(secret);
         });

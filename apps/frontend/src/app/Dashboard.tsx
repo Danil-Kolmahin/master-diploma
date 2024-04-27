@@ -15,20 +15,17 @@ export const Dashboard = () => {
   const [namespaces, setNamespaces] = useState<
     { id: string; name: string; parentId: string }[]
   >([]);
-  const [secrets, setSecrets] = useState<{ name: string }[][]>([]);
+  const [secrets, setSecrets] = useState<
+    { name: string; namespaceId: string }[]
+  >([]);
 
   useEffect(() => {
     (async () => {
       const allNamespacesRes = await axios('/namespaces/all');
-      const allSecretsRes = await Promise.all(
-        allNamespacesRes.data.map(
-          (namespace: { id: string; name: string; parentId: string }) =>
-            axios(`/secrets/all/${namespace.id}`)
-        )
-      );
+      const allSecretsRes = await axios('/secrets/all');
 
       setNamespaces(allNamespacesRes.data);
-      setSecrets(allSecretsRes.map((res) => res.data));
+      setSecrets(allSecretsRes.data);
     })();
   }, []);
 
@@ -44,11 +41,10 @@ export const Dashboard = () => {
               ({ parentId }) =>
                 namespaces.find(({ id }) => parentId === id)?.name || ''
             ),
-            text: secrets.map((namespaceSecrets) =>
-              namespaceSecrets.reduce(
-                (acc, { name }) => acc + '<br>' + name,
-                ''
-              )
+            text: namespaces.map(({ id }) =>
+              secrets
+                .filter(({ namespaceId }) => namespaceId === id)
+                .reduce((acc, { name }) => acc + '<br>' + name, '')
             ),
             textinfo: 'label+text',
           },

@@ -15,6 +15,12 @@ import { SecretDto } from '../dto/secret.dto';
 export class SecretsController {
   constructor(private readonly secretsService: SecretsService) {}
 
+  @Get('all')
+  @UseGuards(AuthGuard)
+  getAllSecrets(@Req() req: Request) {
+    return this.secretsService.getAllSecrets((req as any).user.projectId);
+  }
+
   @Get('all/:namespaceId')
   @UseGuards(AuthGuard)
   findByNamespaceId(@Param('namespaceId') namespaceId: string) {

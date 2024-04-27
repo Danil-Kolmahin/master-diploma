@@ -10,8 +10,12 @@ export class SecretsService {
     private readonly secretsRepository: Repository<Secret>
   ) {}
 
+  getAllSecrets(projectId: string): Promise<Secret[]> {
+    return this.secretsRepository.findBy({ projectId });
+  }
+
   findByNamespaceId(namespaceId: string): Promise<Secret[]> {
-    return this.secretsRepository.find({ where: { namespaceId } });
+    return this.secretsRepository.findBy({ namespaceId });
   }
 
   async insert(
