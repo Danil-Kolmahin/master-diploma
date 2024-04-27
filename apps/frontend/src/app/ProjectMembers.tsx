@@ -1,7 +1,13 @@
 import styled from '@emotion/styled';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import {
+  decryptSymmetricKey,
+  encryptSymmetricKey,
+  getPublicKeyFromString,
+} from './utils/key-pair';
+import { getFromDB } from './utils/indexed-db';
 
 const PlotContainer = styled.div`
   width: 100%;
@@ -74,6 +80,37 @@ export const ProjectMembers = () => {
     })();
   }, []);
 
+  const setRole = useCallback(async () => {
+    const user = (await axios(`/users/${newNamespaceName}`)).data;
+    const entities = (await axios(`/roles/${roleName}/security-keys`)).data;
+    const privateKey = await getFromDB();
+    const reEntities = await Promise.all(
+      entities.map(async (entity: any) => {
+        console.log(entity);
+        const symmetricKey = await decryptSymmetricKey(
+          entity.encryptedSecurityKey,
+          privateKey
+        );
+        console.log(symmetricKey);
+        console.log(user.publicKey);
+        console.log(await getPublicKeyFromString(user.publicKey));
+        const reEncryptedSecurityKey = await encryptSymmetricKey(
+          symmetricKey,
+          await getPublicKeyFromString(user.publicKey)
+        );
+        return {
+          entityId: entity.entityId,
+          encryptedSecurityKey: reEncryptedSecurityKey,
+        };
+      })
+    );
+    await axios.patch('/members/role', {
+      userId: user.id,
+      roleName,
+      entities: reEntities,
+    });
+  }, [newNamespaceName, roleName]);
+
   return (
     <PlotContainer>
       {data.map((user: any) => (
@@ -91,12 +128,6 @@ export const ProjectMembers = () => {
           placeholder="email"
           type="email"
         />
-        <NamespaceNameInput
-          value={roleName}
-          onChange={(e) => setRoleName(e.target.value)}
-          placeholder="role"
-          type="text"
-        />
         <Button
           onClick={async () => {
             const { data: link } = await axios.post('/invite', {
@@ -110,6 +141,13 @@ export const ProjectMembers = () => {
         >
           invite
         </Button>
+        <NamespaceNameInput
+          value={roleName}
+          onChange={(e) => setRoleName(e.target.value)}
+          placeholder="role"
+          type="text"
+        />
+        <Button onClick={() => setRole()}>set role</Button>
       </NamespaceBlock>
     </PlotContainer>
   );

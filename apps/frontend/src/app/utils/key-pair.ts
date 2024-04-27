@@ -119,7 +119,7 @@ export const decryptSymmetricKey = async (
     'raw',
     decryptedKey,
     { name: 'AES-GCM' },
-    false,
+    true,
     ['encrypt', 'decrypt']
   );
 };

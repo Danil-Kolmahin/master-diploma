@@ -1,4 +1,8 @@
-import { AuthGuard, CasbinService } from '@master-diploma/library';
+import {
+  AuthGuard,
+  CasbinService,
+  SecurityKeysService,
+} from '@master-diploma/library';
 import {
   Controller,
   UseGuards,
@@ -7,13 +11,18 @@ import {
   Param,
   Post,
   Body,
+  Patch,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { AddRoleDto } from '../dto/roles.dto';
+import { AddRoleDto, ChangeUserRoleDto } from '../dto/roles.dto';
 
 @Controller()
 export class PermissionsController {
-  constructor(private readonly casbinService: CasbinService) {}
+  constructor(
+    private readonly casbinService: CasbinService,
+    private readonly securityKeysService: SecurityKeysService
+  ) {}
 
   @Get('members')
   @UseGuards(AuthGuard)
@@ -43,6 +52,64 @@ export class PermissionsController {
       roleName,
       (req as any).user.projectId,
       policies
+    );
+  }
+
+  @Get('roles/:roleName/security-keys')
+  @UseGuards(AuthGuard)
+  async getRoleSecurityKeys(
+    @Req() req: Request,
+    @Param('roleName') roleName: string
+  ) {
+    const securityKeys = await this.securityKeysService.findByProjectId(
+      (req as any).user.sub,
+      (req as any).user.projectId
+    );
+    const rolePolicies = await this.casbinService.findRoleByName(
+      roleName,
+      (req as any).user.projectId
+    );
+    const response = rolePolicies
+      .filter(([, action]) => action === 'read')
+      .map(([object]) => ({
+        entityId: object,
+        encryptedSecurityKey: (securityKeys.find(
+          ({ entityId }) => entityId === object
+        )).encryptedKey,
+      }));
+
+    if (response.some(({ encryptedSecurityKey }) => !encryptedSecurityKey))
+      throw new UnauthorizedException();
+
+    return response;
+  }
+
+  @Patch('members/role')
+  @UseGuards(AuthGuard)
+  async changeUserRole(
+    @Req() req: Request,
+    @Body()
+    { userId, roleName, entities }: ChangeUserRoleDto
+  ) {
+    await this.securityKeysService.deleteAllUserKeys(
+      userId,
+      (req as any).user.projectId
+    );
+    await this.casbinService.changeUserRole(
+      userId,
+      roleName,
+      (req as any).user.projectId
+    );
+
+    await Promise.all(
+      entities.map(({ entityId, encryptedSecurityKey }) =>
+        this.securityKeysService.insert(
+          userId,
+          (req as any).user.projectId,
+          entityId,
+          encryptedSecurityKey
+        )
+      )
     );
   }
 }

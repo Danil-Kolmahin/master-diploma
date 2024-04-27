@@ -1,6 +1,6 @@
 import { AuthGuard, UsersService } from '@master-diploma/library';
-import { Controller, UseGuards, Get, Req } from '@nestjs/common';
-
+import { Controller, UseGuards, Get, Req, Param } from '@nestjs/common';
+import { Request } from 'express';
 import { AppService } from './app.service';
 
 @Controller()
@@ -22,8 +22,16 @@ export class AppController {
 
   @Get('profile')
   @UseGuards(AuthGuard)
-  async getProfile(@Req() req) {
-    const user = await this.usersService.findOneByEmail(req.user.email);
-    return { ...user, ...req.user };
+  async getProfile(@Req() req: Request) {
+    const user = await this.usersService.findOneByEmail(
+      (req as any).user.email
+    );
+    return { ...user, ...(req as any).user };
+  }
+
+  @Get('users/:email')
+  @UseGuards(AuthGuard)
+  async findUserByEmail(@Param('email') email: string) {
+    return this.usersService.findOneByEmail(email);
   }
 }

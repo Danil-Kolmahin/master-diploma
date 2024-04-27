@@ -59,6 +59,19 @@ export class CasbinService implements OnApplicationBootstrap {
     );
   }
 
+  async changeUserRole(
+    userId: string,
+    roleName: string,
+    projectId: string
+  ): Promise<void> {
+    await (this.enforcer as Enforcer).deleteRolesForUser(userId, projectId);
+    await (this.enforcer as Enforcer).addRoleForUser(
+      userId,
+      roleName,
+      projectId
+    );
+  }
+
   async hasRoleInProject(userId: string, projectId: string): Promise<boolean> {
     const roles = await (this.enforcer as Enforcer).getRolesForUserInDomain(
       userId,

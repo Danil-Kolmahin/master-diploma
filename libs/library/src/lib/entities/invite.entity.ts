@@ -12,9 +12,6 @@ export class Invite extends BaseEntity {
   @Column({ type: 'varchar', update: false })
   projectName: string;
 
-  @Column({ type: 'varchar', update: false })
-  roleName: string;
-
   @Column({ type: 'timestamptz', update: false })
   expiresAt: Date;
 }

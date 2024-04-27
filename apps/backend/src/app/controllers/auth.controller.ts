@@ -117,9 +117,9 @@ export class AuthController {
 
   @Post('invite')
   @UseGuards(AuthGuard)
-  async invite(@Body() { projectName, email, roleName }: InviteDto) {
+  async invite(@Body() { projectName, email }: InviteDto) {
     const inviteToken = randomBytes(32).toString('hex');
-    await this.invitesService.insert(inviteToken, email, roleName, projectName);
+    await this.invitesService.insert(inviteToken, email, projectName);
     return `http://localhost:4200/auth/from-invite/${inviteToken}`; // TODO: url
   }
 
@@ -144,7 +144,7 @@ export class AuthController {
 
     await this.casbinService.addRoleForUser(
       userId,
-      validInvite.roleName,
+      'none',
       projectId
     );
   }

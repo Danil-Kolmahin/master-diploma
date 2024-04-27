@@ -29,6 +29,13 @@ export class SecurityKeysService {
     });
   }
 
+  async deleteAllUserKeys(userId: string, projectId: string): Promise<void> {
+    await this.securityKeysRepository.delete({
+      userId,
+      projectId,
+    });
+  }
+
   async insert(
     userId: string,
     projectId: string,

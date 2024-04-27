@@ -29,14 +29,12 @@ export class InvitesService {
   async insert(
     body: string,
     email: string,
-    roleName: string,
     projectName: string
   ): Promise<void | never> {
     await this.invitesRepository.insert({
       body,
       email,
       projectName,
-      roleName,
       expiresAt: new Date(new Date().getTime() + 5 * 60 * 1000),
     });
   }

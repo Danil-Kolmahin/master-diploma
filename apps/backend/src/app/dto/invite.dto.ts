@@ -7,7 +7,4 @@ export class InviteDto extends SignInDto {
 
   @IsString()
   projectName: string;
-
-  @IsString()
-  roleName: string;
 }
