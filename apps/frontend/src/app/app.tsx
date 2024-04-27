@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/react';
-import { Chart } from './Chart';
+import { Dashboard } from './Dashboard';
 import { Auth } from './Auth';
 import { NotFound } from './NotFound';
 import { PrivateKeyCatcher } from './PrivateKeyCatcher';
@@ -51,7 +51,7 @@ export const App = () => {
             element={<PrivateKeyCatcher />}
           />
           <Route element={<ContentContainer />}>
-            <Route path="/" element={<Chart />} />
+            <Route path="/" element={<Dashboard />} />
             <Route path="/namespaces-secrets" element={<NamespacesSecrets />} />
             <Route path="/roles-policies" element={<RolesPolicies />} />
             <Route path="/roles-policies/:roleName" element={<Role />} />
