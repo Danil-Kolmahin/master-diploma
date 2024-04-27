@@ -7,8 +7,11 @@ import {
 import { Body, Controller, Post, UseGuards, Req, Get } from '@nestjs/common';
 import { Request } from 'express';
 import { NamespaceDto } from '../dto/namespace.dto';
+import { ApiCookieAuth } from '@nestjs/swagger';
 
+@ApiCookieAuth()
 @Controller('namespaces')
+@UseGuards(AuthGuard)
 export class NamespacesController {
   constructor(
     private readonly namespacesService: NamespacesService,
@@ -17,7 +20,6 @@ export class NamespacesController {
   ) {}
 
   @Get('all')
-  @UseGuards(AuthGuard)
   async findByProjectId(@Req() req: Request) {
     const namespaces = await this.namespacesService.findByProjectId(
       (req as any).user.projectId
@@ -46,12 +48,12 @@ export class NamespacesController {
 
     return result.map((n) => ({
       ...n,
-      encryptedSecurityKey: (securityKeys.find((k) => k.entityId === n.id))?.encryptedKey,
+      encryptedSecurityKey: securityKeys.find((k) => k.entityId === n.id)
+        ?.encryptedKey,
     }));
   }
 
   @Post()
-  @UseGuards(AuthGuard)
   async insert(
     @Req() req: Request,
     @Body() { name, parentId, encryptedSecurityKey }: NamespaceDto

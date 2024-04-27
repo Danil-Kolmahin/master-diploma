@@ -1,23 +1,14 @@
 import { AuthGuard, UsersService } from '@master-diploma/library';
 import { Controller, UseGuards, Get, Req, Param } from '@nestjs/common';
 import { Request } from 'express';
-import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    private readonly usersService: UsersService
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Get('version')
   version() {
     return process.env.npm_package_version;
-  }
-
-  @Get('api')
-  getData() {
-    return this.appService.getData();
   }
 
   @Get('profile')
