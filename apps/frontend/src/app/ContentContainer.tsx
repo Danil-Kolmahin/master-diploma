@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 import axios, { isAxiosError } from 'axios';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { deleteFromDB } from './utils/indexed-db';
+import { deleteFromDB, getFromDB } from './utils/indexed-db';
 
 const Sidebar = styled.div`
   display: table-cell;
@@ -51,6 +51,12 @@ export const ContentContainer = () => {
   const navigate = useNavigate();
   const [data, setData] = useState({});
 
+  const logout = useCallback(async () => {
+    await deleteFromDB();
+    await axios('/logout');
+    navigate('/auth');
+  }, [navigate]);
+
   useEffect(() => {
     (async () => {
       try {
@@ -61,6 +67,58 @@ export const ContentContainer = () => {
       }
     })();
   }, [navigate]);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const privateKeyExists = await getFromDB();
+      if (privateKeyExists) {
+        const encryptedChallenge = (
+          await axios.post('/sign-in/challenge-request', {
+            email: (data as any).email,
+            projectName: (data as any).projectName,
+          })
+        ).data;
+
+        const challenge = new TextDecoder().decode(
+          await window.crypto.subtle.decrypt(
+            { name: 'RSA-OAEP' },
+            await getFromDB(),
+            Uint8Array.from(window.atob(encryptedChallenge), (c) =>
+              c.charCodeAt(0)
+            )
+          )
+        );
+
+        await axios.post('/sign-in/challenge-response', {
+          email: (data as any).email,
+          projectName: (data as any).projectName,
+          challenge,
+        });
+      } else logout();
+    }, 4 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [logout, data]);
+
+  useEffect(() => {
+    let logoutTimer = setTimeout(logout, 5 * 60 * 1000);
+
+    const resetTimer = () => {
+      clearTimeout(logoutTimer);
+      logoutTimer = setTimeout(logout, 5 * 60 * 1000);
+    };
+
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keypress', resetTimer);
+    window.addEventListener('click', resetTimer);
+
+    return () => {
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('keypress', resetTimer);
+      window.removeEventListener('click', resetTimer);
+      clearTimeout(logoutTimer);
+    };
+  }, [logout]);
 
   return (
     <>
@@ -74,13 +132,7 @@ export const ContentContainer = () => {
         </SidebarItemLink>
         <SidebarItemLink to="/roles-policies">roles-policies</SidebarItemLink>
         <SidebarItemLink to="/project-members">project-members</SidebarItemLink>
-        <SidebarItemLink
-          to="/auth"
-          onClick={() => {
-            deleteFromDB();
-            axios('/logout');
-          }}
-        >
+        <SidebarItemLink to="/auth" onClick={logout}>
           log out
         </SidebarItemLink>
       </Sidebar>
