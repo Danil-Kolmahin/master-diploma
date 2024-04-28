@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@master-diploma/library": ["libs/library/src/index.ts"]
+      "@master-diploma/library": ["libs/library/src/index.ts"],
+      "@master-diploma/shared-resources": ["libs/shared-resources/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

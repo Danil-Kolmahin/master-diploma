@@ -1,0 +1,8 @@
+{
+  "name": "shared-resources",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared-resources/src",
+  "projectType": "library",
+  "targets": {},
+  "tags": []
+}
