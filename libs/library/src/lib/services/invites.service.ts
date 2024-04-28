@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
-
+import { ACCESS_TIME } from '@master-diploma/shared-resources';
 import { Invite } from '../entities/invite.entity';
 
 @Injectable()
@@ -35,7 +35,7 @@ export class InvitesService {
       body,
       email,
       projectName,
-      expiresAt: new Date(new Date().getTime() + 5 * 60 * 1000),
+      expiresAt: new Date(new Date().getTime() + ACCESS_TIME),
     });
   }
 

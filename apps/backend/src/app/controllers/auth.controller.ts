@@ -24,6 +24,7 @@ import { Response } from 'express';
 
 import { constants, publicEncrypt, randomBytes } from 'crypto';
 import { InviteDto } from '../dto/invite.dto';
+import { COOKIE_NAME, COOKIE_OPTIONS } from '@master-diploma/shared-resources';
 
 @Controller()
 export class AuthController {
@@ -96,23 +97,13 @@ export class AuthController {
 
     await this.challengesService.delete(challenge);
     const access_token = await this.authService.signIn(email, projectName);
-    res.cookie('SMS_ACCESS_TOKEN', access_token, {
-      maxAge: 5 * 60 * 1000,
-      // TODO: secure: true,
-      sameSite: 'strict',
-      httpOnly: true,
-    });
+    res.cookie(COOKIE_NAME, access_token, COOKIE_OPTIONS);
   }
 
   @Get('logout')
   @UseGuards(AuthGuard)
   logout(@Res({ passthrough: true }) res: Response) {
-    res.cookie('SMS_ACCESS_TOKEN', '', {
-      maxAge: 0,
-      // TODO: secure: true,
-      sameSite: 'strict',
-      httpOnly: true,
-    });
+    res.cookie(COOKIE_NAME, '', { ...COOKIE_OPTIONS, maxAge: 0 });
   }
 
   @Post('invite')
@@ -142,10 +133,6 @@ export class AuthController {
       projectName
     );
 
-    await this.casbinService.addRoleForUser(
-      userId,
-      'none',
-      projectId
-    );
+    await this.casbinService.addRoleForUser(userId, 'none', projectId);
   }
 }

@@ -18,6 +18,7 @@ import { NamespacesService } from './services/namespaces.service';
 import { SecretsService } from './services/secrets.service';
 import { SecurityKey } from './entities/security-key.entity';
 import { SecurityKeysService } from './services/security-key.service';
+import { ACCESS_TIME } from '@master-diploma/shared-resources';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { SecurityKeysService } from './services/security-key.service';
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '5m' },
+      signOptions: { expiresIn: ACCESS_TIME },
     }),
   ],
   providers: [

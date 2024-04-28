@@ -3,6 +3,7 @@ import axios, { isAxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { deleteFromDB, getFromDB } from './utils/indexed-db';
+import { ACCESS_TIME } from '@master-diploma/shared-resources';
 
 const Sidebar = styled.div`
   display: table-cell;
@@ -95,17 +96,17 @@ export const ContentContainer = () => {
           challenge,
         });
       } else logout();
-    }, 4 * 60 * 1000);
+    }, ACCESS_TIME - 60 * 1000);
 
     return () => clearInterval(interval);
   }, [logout, data]);
 
   useEffect(() => {
-    let logoutTimer = setTimeout(logout, 5 * 60 * 1000);
+    let logoutTimer = setTimeout(logout, ACCESS_TIME);
 
     const resetTimer = () => {
       clearTimeout(logoutTimer);
-      logoutTimer = setTimeout(logout, 5 * 60 * 1000);
+      logoutTimer = setTimeout(logout, ACCESS_TIME);
     };
 
     window.addEventListener('mousemove', resetTimer);

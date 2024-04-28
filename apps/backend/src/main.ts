@@ -4,6 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { COOKIE_NAME } from '@master-diploma/shared-resources';
 import helmet from 'helmet';
 
 async function bootstrap() {
@@ -22,7 +23,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('SMS API')
-    .addCookieAuth('SMS_ACCESS_TOKEN')
+    .addCookieAuth(COOKIE_NAME)
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
-
+import { ACCESS_TIME } from '@master-diploma/shared-resources';
 import { Challenge } from '../entities/challenge.entity';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class ChallengesService {
   async insert(body: string): Promise<void | never> {
     await this.challengesRepository.insert({
       body,
-      expiresAt: new Date(new Date().getTime() + 5 * 60 * 1000),
+      expiresAt: new Date(new Date().getTime() + ACCESS_TIME),
     });
   }
 
