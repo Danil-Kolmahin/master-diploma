@@ -8,6 +8,8 @@ export * from './lib/services/namespaces.service';
 export * from './lib/services/secrets.service';
 export * from './lib/services/security-key.service';
 export * from './lib/casbin/casbin.service';
+export * from './lib/services/traces.service';
 export * from './lib/guards/auth.guard';
 export * from './lib/dto/sign-in.dto';
 export * from './lib/dto/sign-up.dto';
+export * from './lib/interceptors/audit.interceptor';

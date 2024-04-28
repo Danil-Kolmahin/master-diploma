@@ -133,6 +133,7 @@ export const ContentContainer = () => {
         </SidebarItemLink>
         <SidebarItemLink to="/roles-policies">roles-policies</SidebarItemLink>
         <SidebarItemLink to="/project-members">project-members</SidebarItemLink>
+        <SidebarItemLink to="/audit">audit</SidebarItemLink>
         <SidebarItemLink to="/auth" onClick={signOut}>
           log out
         </SidebarItemLink>

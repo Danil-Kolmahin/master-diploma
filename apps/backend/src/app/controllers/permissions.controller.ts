@@ -2,6 +2,7 @@ import {
   AuthGuard,
   CasbinService,
   SecurityKeysService,
+  TracesService,
   UsersService,
 } from '@master-diploma/library';
 import {
@@ -24,6 +25,7 @@ export class PermissionsController {
     private readonly casbinService: CasbinService,
     private readonly securityKeysService: SecurityKeysService,
     private readonly usersService: UsersService,
+    private readonly tracesService: TracesService
   ) {}
 
   @Get('members')
@@ -75,9 +77,9 @@ export class PermissionsController {
       .filter(([, action]) => action === 'read')
       .map(([object]) => ({
         entityId: object,
-        encryptedSecurityKey: (securityKeys.find(
+        encryptedSecurityKey: securityKeys.find(
           ({ entityId }) => entityId === object
-        )).encryptedKey,
+        ).encryptedKey,
       }));
 
     if (response.some(({ encryptedSecurityKey }) => !encryptedSecurityKey))
@@ -128,5 +130,11 @@ export class PermissionsController {
   @UseGuards(AuthGuard)
   async findUserByEmail(@Param('email') email: string) {
     return this.usersService.findOneByEmail(email);
+  }
+
+  @Get('other/audit')
+  @UseGuards(AuthGuard)
+  async audit(@Req() req: Request) {
+    return this.tracesService.findByProjectId((req as any).user.projectId);
   }
 }

@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { LibraryModule } from '@master-diploma/library';
+import { AuditInterceptor, LibraryModule } from '@master-diploma/library';
 import { SystemController } from './controllers/system.controller';
 import { AuthController } from './controllers/auth.controller';
 import { NamespacesController } from './controllers/namespaces.controller';
 import { SecretsController } from './controllers/secrets.controller';
 import { PermissionsController } from './controllers/permissions.controller';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import {
   REQUEST_RATE_LIMIT,
   REQUEST_RATE_TTL,
@@ -36,6 +36,9 @@ import {
     SecretsController,
     PermissionsController,
   ],
-  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
+  providers: [
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
+  ],
 })
 export class AppModule {}

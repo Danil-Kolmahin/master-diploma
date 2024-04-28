@@ -11,6 +11,7 @@ import { NamespacesSecrets } from './NamespacesSecrets';
 import { ProjectMembers } from './ProjectMembers';
 import { RolesPolicies } from './RolesPolicies';
 import { Role } from './Role';
+import { Audit } from './Audit';
 
 axios.defaults.baseURL = 'http://localhost:3001';
 
@@ -56,6 +57,7 @@ export const App = () => {
             <Route path="/roles-policies" element={<RolesPolicies />} />
             <Route path="/roles-policies/:roleName" element={<Role />} />
             <Route path="/project-members" element={<ProjectMembers />} />
+            <Route path="/audit" element={<Audit />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

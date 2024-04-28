@@ -19,6 +19,8 @@ import { SecretsService } from './services/secrets.service';
 import { SecurityKey } from './entities/security-key.entity';
 import { SecurityKeysService } from './services/security-key.service';
 import { ACCESS_TIME } from '@master-diploma/shared-resources';
+import { Trace } from './entities/trace.entity';
+import { TracesService } from './services/traces.service';
 
 @Module({
   imports: [
@@ -31,6 +33,7 @@ import { ACCESS_TIME } from '@master-diploma/shared-resources';
       Namespace,
       Secret,
       SecurityKey,
+      Trace,
     ]),
     JwtModule.register({
       global: true,
@@ -48,6 +51,7 @@ import { ACCESS_TIME } from '@master-diploma/shared-resources';
     NamespacesService,
     SecretsService,
     SecurityKeysService,
+    TracesService,
   ],
   exports: [
     UsersService,
@@ -59,6 +63,7 @@ import { ACCESS_TIME } from '@master-diploma/shared-resources';
     NamespacesService,
     SecretsService,
     SecurityKeysService,
+    TracesService,
   ],
 })
 export class LibraryModule {}
