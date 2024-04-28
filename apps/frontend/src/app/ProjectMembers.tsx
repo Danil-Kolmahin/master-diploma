@@ -130,11 +130,12 @@ export const ProjectMembers = () => {
         />
         <Button
           onClick={async () => {
-            const { data: link } = await axios.post('/invite', {
+            const { data } = await axios.post('/invite', {
               email: newNamespaceName,
               projectName,
               roleName,
             });
+            const link = `${window.location.protocol}//${window.location.host}${data}`;
             await navigator.clipboard.writeText(link);
             alert(`invite link: ${link}`);
           }}

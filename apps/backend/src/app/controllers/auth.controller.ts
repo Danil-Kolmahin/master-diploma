@@ -18,11 +18,9 @@ import {
   Get,
   Res,
   UnauthorizedException,
-  Req,
   Query,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { Request } from 'express';
 import { constants, publicEncrypt, randomBytes } from 'crypto';
 import { InviteDto } from '../dto/invite.dto';
 import { COOKIE_NAME, COOKIE_OPTIONS } from '@master-diploma/shared-resources';
@@ -141,12 +139,9 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Post('invite')
   @ApiCreatedResponse({ type: String })
-  async invite(
-    @Req() { protocol, headers: { host } }: Request,
-    @Body() { projectName, email }: InviteDto
-  ): Promise<string> {
+  async invite(@Body() { projectName, email }: InviteDto): Promise<string> {
     const inviteToken = randomBytes(32).toString('hex');
     await this.invitesService.insert(inviteToken, email, projectName);
-    return `${protocol}://${host}/auth/from-invite/${inviteToken}`;
+    return `/auth/from-invite/${inviteToken}`;
   }
 }
