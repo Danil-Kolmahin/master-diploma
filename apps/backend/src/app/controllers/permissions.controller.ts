@@ -2,6 +2,7 @@ import {
   AuthGuard,
   CasbinService,
   SecurityKeysService,
+  UsersService,
 } from '@master-diploma/library';
 import {
   Controller,
@@ -21,7 +22,8 @@ import { AddRoleDto, ChangeUserRoleDto } from '../dto/roles.dto';
 export class PermissionsController {
   constructor(
     private readonly casbinService: CasbinService,
-    private readonly securityKeysService: SecurityKeysService
+    private readonly securityKeysService: SecurityKeysService,
+    private readonly usersService: UsersService,
   ) {}
 
   @Get('members')
@@ -111,5 +113,20 @@ export class PermissionsController {
         )
       )
     );
+  }
+
+  @Get('profile')
+  @UseGuards(AuthGuard)
+  async getProfile(@Req() req: Request) {
+    const user = await this.usersService.findOneByEmail(
+      (req as any).user.email
+    );
+    return { ...user, ...(req as any).user };
+  }
+
+  @Get('users/:email')
+  @UseGuards(AuthGuard)
+  async findUserByEmail(@Param('email') email: string) {
+    return this.usersService.findOneByEmail(email);
   }
 }

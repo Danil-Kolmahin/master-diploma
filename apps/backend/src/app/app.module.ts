@@ -1,15 +1,17 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
 import { LibraryModule } from '@master-diploma/library';
-
-import { AppController } from './app.controller';
+import { SystemController } from './controllers/system.controller';
 import { AuthController } from './controllers/auth.controller';
 import { NamespacesController } from './controllers/namespaces.controller';
 import { SecretsController } from './controllers/secrets.controller';
 import { PermissionsController } from './controllers/permissions.controller';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import {
+  REQUEST_RATE_LIMIT,
+  REQUEST_RATE_TTL,
+} from '@master-diploma/shared-resources';
 
 @Module({
   imports: [
@@ -23,10 +25,12 @@ import { APP_GUARD } from '@nestjs/core';
       synchronize: true,
       autoLoadEntities: true,
     }),
-    ThrottlerModule.forRoot([{ ttl: 60000, limit: 10 }]),
+    ThrottlerModule.forRoot([
+      { ttl: REQUEST_RATE_TTL, limit: REQUEST_RATE_LIMIT },
+    ]),
   ],
   controllers: [
-    AppController,
+    SystemController,
     AuthController,
     NamespacesController,
     SecretsController,

@@ -18,14 +18,22 @@ import {
   Get,
   Res,
   UnauthorizedException,
-  Param,
+  Req,
+  Query,
 } from '@nestjs/common';
 import { Response } from 'express';
-
+import { Request } from 'express';
 import { constants, publicEncrypt, randomBytes } from 'crypto';
 import { InviteDto } from '../dto/invite.dto';
 import { COOKIE_NAME, COOKIE_OPTIONS } from '@master-diploma/shared-resources';
+import {
+  ApiCookieAuth,
+  ApiCreatedResponse,
+  ApiTags,
+  ApiQuery,
+} from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller()
 export class AuthController {
   constructor(
@@ -38,20 +46,42 @@ export class AuthController {
   ) {}
 
   @Post('sign-up')
-  async signUp(@Body() { projectName, email, publicKey }: SignUpDto) {
+  @ApiQuery({ type: String, required: false })
+  async signUp(
+    @Body() { projectName, email, publicKey }: SignUpDto,
+    @Query('inviteToken') inviteToken?: string
+  ): Promise<void> {
+    if (inviteToken) {
+      const validInvite = await this.invitesService.findOneByBEP(
+        inviteToken,
+        email,
+        projectName
+      );
+      if (!validInvite) throw new UnauthorizedException();
+
+      await this.invitesService.delete(email, projectName);
+    }
+
     await this.usersService.insert(email, publicKey);
     const { id: userId } = await this.usersService.findOneByEmail(email);
 
-    await this.projectsService.insert(projectName);
+    if (!inviteToken) await this.projectsService.insert(projectName);
     const { id: projectId } = await this.projectsService.findOneByName(
       projectName
     );
 
-    await this.casbinService.addRoleForUser(userId, 'root', projectId);
+    await this.casbinService.addRoleForUser(
+      userId,
+      inviteToken ? 'none' : 'root',
+      projectId
+    );
   }
 
   @Post('sign-in/challenge-request')
-  async signInChallengeRequest(@Body() { projectName, email }: SignInDto) {
+  @ApiCreatedResponse({ type: String })
+  async signInChallengeRequest(
+    @Body() { projectName, email }: SignInDto
+  ): Promise<string> {
     const user = await this.usersService.findOneByEmail(email);
     const project = await this.projectsService.findOneByName(projectName);
     if (!user || !project) throw new UnauthorizedException();
@@ -79,7 +109,7 @@ export class AuthController {
   async signInChallengeResponse(
     @Body() { projectName, email, challenge }: SignInAndVerifyChallengeDto,
     @Res({ passthrough: true }) res: Response
-  ) {
+  ): Promise<void> {
     const user = await this.usersService.findOneByEmail(email);
     const project = await this.projectsService.findOneByName(projectName);
     if (!user || !project) throw new UnauthorizedException();
@@ -100,39 +130,23 @@ export class AuthController {
     res.cookie(COOKIE_NAME, access_token, COOKIE_OPTIONS);
   }
 
-  @Get('logout')
+  @ApiCookieAuth()
   @UseGuards(AuthGuard)
-  logout(@Res({ passthrough: true }) res: Response) {
+  @Get('sign-out')
+  signOut(@Res({ passthrough: true }) res: Response): void {
     res.cookie(COOKIE_NAME, '', { ...COOKIE_OPTIONS, maxAge: 0 });
   }
 
-  @Post('invite')
+  @ApiCookieAuth()
   @UseGuards(AuthGuard)
-  async invite(@Body() { projectName, email }: InviteDto) {
+  @Post('invite')
+  @ApiCreatedResponse({ type: String })
+  async invite(
+    @Req() { protocol, headers: { host } }: Request,
+    @Body() { projectName, email }: InviteDto
+  ): Promise<string> {
     const inviteToken = randomBytes(32).toString('hex');
     await this.invitesService.insert(inviteToken, email, projectName);
-    return `http://localhost:4200/auth/from-invite/${inviteToken}`; // TODO: url
-  }
-
-  @Post('sign-up/from-invite/:inviteToken')
-  async signUpFromInvite(
-    @Param('inviteToken') inviteToken: string,
-    @Body() { projectName, email, publicKey }: SignUpDto
-  ) {
-    const validInvite = await this.invitesService.findOneByBEP(
-      inviteToken,
-      email,
-      projectName
-    );
-    if (!validInvite) throw new UnauthorizedException();
-
-    await this.invitesService.delete(email, projectName);
-    await this.usersService.insert(email, publicKey);
-    const { id: userId } = await this.usersService.findOneByEmail(email);
-    const { id: projectId } = await this.projectsService.findOneByName(
-      projectName
-    );
-
-    await this.casbinService.addRoleForUser(userId, 'none', projectId);
+    return `${protocol}://${host}/auth/from-invite/${inviteToken}`;
   }
 }

@@ -52,9 +52,9 @@ export const ContentContainer = () => {
   const navigate = useNavigate();
   const [data, setData] = useState({});
 
-  const logout = useCallback(async () => {
+  const signOut = useCallback(async () => {
     await deleteFromDB();
-    await axios('/logout');
+    await axios('/sign-out');
     navigate('/auth');
   }, [navigate]);
 
@@ -95,18 +95,18 @@ export const ContentContainer = () => {
           projectName: (data as any).projectName,
           challenge,
         });
-      } else logout();
+      } else signOut();
     }, ACCESS_TIME - 60 * 1000);
 
     return () => clearInterval(interval);
-  }, [logout, data]);
+  }, [signOut, data]);
 
   useEffect(() => {
-    let logoutTimer = setTimeout(logout, ACCESS_TIME);
+    let logoutTimer = setTimeout(signOut, ACCESS_TIME);
 
     const resetTimer = () => {
       clearTimeout(logoutTimer);
-      logoutTimer = setTimeout(logout, ACCESS_TIME);
+      logoutTimer = setTimeout(signOut, ACCESS_TIME);
     };
 
     window.addEventListener('mousemove', resetTimer);
@@ -119,7 +119,7 @@ export const ContentContainer = () => {
       window.removeEventListener('click', resetTimer);
       clearTimeout(logoutTimer);
     };
-  }, [logout]);
+  }, [signOut]);
 
   return (
     <>
@@ -133,7 +133,7 @@ export const ContentContainer = () => {
         </SidebarItemLink>
         <SidebarItemLink to="/roles-policies">roles-policies</SidebarItemLink>
         <SidebarItemLink to="/project-members">project-members</SidebarItemLink>
-        <SidebarItemLink to="/auth" onClick={logout}>
+        <SidebarItemLink to="/auth" onClick={signOut}>
           log out
         </SidebarItemLink>
       </Sidebar>

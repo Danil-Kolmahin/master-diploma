@@ -94,12 +94,13 @@ export const Auth = () => {
       try {
         let keyPair: CryptoKeyPair | null = await generateKeyPair();
         await axios.post(
-          inviteToken ? `/sign-up/from-invite/${inviteToken}` : '/sign-up',
+          '/sign-up',
           {
             email,
             publicKey: await extractPublicKey(keyPair.publicKey),
             projectName,
-          }
+          },
+          { params: { inviteToken } }
         );
         saveFile(
           await extractPrivateKey(keyPair.privateKey),
