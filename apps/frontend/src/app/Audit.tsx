@@ -8,7 +8,7 @@ export const Audit = () => {
   useEffect(() => {
     (async () => {
       try {
-        const audit = await axios('/other/audit');
+        const audit = await axios('/security/audit');
         const response = await axios('/members');
         setData(audit.data.reverse());
         setUsers(response.data);

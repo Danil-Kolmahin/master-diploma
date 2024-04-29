@@ -13,3 +13,4 @@ export * from './lib/guards/auth.guard';
 export * from './lib/dto/sign-in.dto';
 export * from './lib/dto/sign-up.dto';
 export * from './lib/interceptors/audit.interceptor';
+export * from './lib/decorators/auth-data.decorator';

@@ -1,14 +1,13 @@
 import {
+  AuthData,
   AuthGuard,
   CasbinService,
   SecurityKeysService,
-  TracesService,
   UsersService,
 } from '@master-diploma/library';
 import {
   Controller,
   UseGuards,
-  Req,
   Get,
   Param,
   Post,
@@ -16,62 +15,60 @@ import {
   Patch,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { AddRoleDto, ChangeUserRoleDto } from '../dto/roles.dto';
+import { AuthDataI } from '@master-diploma/shared-resources';
 
 @Controller()
 export class PermissionsController {
   constructor(
     private readonly casbinService: CasbinService,
     private readonly securityKeysService: SecurityKeysService,
-    private readonly usersService: UsersService,
-    private readonly tracesService: TracesService
+    private readonly usersService: UsersService
   ) {}
 
   @Get('members')
   @UseGuards(AuthGuard)
-  findByProjectId(@Req() req: Request) {
-    return this.casbinService.findUsersInProject((req as any).user.projectId);
+  findByProjectId(@AuthData() { projectId }: AuthDataI) {
+    return this.casbinService.findUsersInProject(projectId);
   }
 
   @Get('roles')
   @UseGuards(AuthGuard)
-  getAllRolesNames(@Req() req: Request) {
-    return this.casbinService.getAllRolesNames((req as any).user.projectId);
+  getAllRolesNames(@AuthData() { projectId }: AuthDataI) {
+    return this.casbinService.getAllRolesNames(projectId);
   }
 
   @Get('roles/:roleName')
   @UseGuards(AuthGuard)
-  findRoleByName(@Req() req: Request, @Param('roleName') roleName: string) {
-    return this.casbinService.findRoleByName(
-      roleName,
-      (req as any).user.projectId
-    );
+  findRoleByName(
+    @AuthData() { projectId }: AuthDataI,
+    @Param('roleName') roleName: string
+  ) {
+    return this.casbinService.findRoleByName(roleName, projectId);
   }
 
   @Post('roles')
   @UseGuards(AuthGuard)
-  addRole(@Req() req: Request, @Body() { roleName, policies }: AddRoleDto) {
-    return this.casbinService.addRole(
-      roleName,
-      (req as any).user.projectId,
-      policies
-    );
+  addRole(
+    @AuthData() { projectId }: AuthDataI,
+    @Body() { roleName, policies }: AddRoleDto
+  ) {
+    return this.casbinService.addRole(roleName, projectId, policies);
   }
 
   @Get('roles/:roleName/security-keys')
   @UseGuards(AuthGuard)
   async getRoleSecurityKeys(
-    @Req() req: Request,
+    @AuthData() { sub, projectId }: AuthDataI,
     @Param('roleName') roleName: string
   ) {
     const securityKeys = await this.securityKeysService.findByProjectId(
-      (req as any).user.sub,
-      (req as any).user.projectId
+      sub,
+      projectId
     );
     const rolePolicies = await this.casbinService.findRoleByName(
       roleName,
-      (req as any).user.projectId
+      projectId
     );
     const response = rolePolicies
       .filter(([, action]) => action === 'read')
@@ -91,25 +88,18 @@ export class PermissionsController {
   @Patch('members/role')
   @UseGuards(AuthGuard)
   async changeUserRole(
-    @Req() req: Request,
+    @AuthData() { projectId }: AuthDataI,
     @Body()
     { userId, roleName, entities }: ChangeUserRoleDto
   ) {
-    await this.securityKeysService.deleteAllUserKeys(
-      userId,
-      (req as any).user.projectId
-    );
-    await this.casbinService.changeUserRole(
-      userId,
-      roleName,
-      (req as any).user.projectId
-    );
+    await this.securityKeysService.deleteAllUserKeys(userId, projectId);
+    await this.casbinService.changeUserRole(userId, roleName, projectId);
 
     await Promise.all(
       entities.map(({ entityId, encryptedSecurityKey }) =>
         this.securityKeysService.insert(
           userId,
-          (req as any).user.projectId,
+          projectId,
           entityId,
           encryptedSecurityKey
         )
@@ -119,22 +109,14 @@ export class PermissionsController {
 
   @Get('profile')
   @UseGuards(AuthGuard)
-  async getProfile(@Req() req: Request) {
-    const user = await this.usersService.findOneByEmail(
-      (req as any).user.email
-    );
-    return { ...user, ...(req as any).user };
+  async getProfile(@AuthData() data: AuthDataI) {
+    const user = await this.usersService.findOneByEmail(data.email);
+    return { ...user, ...data };
   }
 
   @Get('users/:email')
   @UseGuards(AuthGuard)
   async findUserByEmail(@Param('email') email: string) {
     return this.usersService.findOneByEmail(email);
-  }
-
-  @Get('other/audit')
-  @UseGuards(AuthGuard)
-  async audit(@Req() req: Request) {
-    return this.tracesService.findByProjectId((req as any).user.projectId);
   }
 }

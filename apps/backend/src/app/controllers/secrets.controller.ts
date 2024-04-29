@@ -1,15 +1,7 @@
-import { AuthGuard, SecretsService } from '@master-diploma/library';
-import {
-  Body,
-  Controller,
-  Post,
-  UseGuards,
-  Req,
-  Get,
-  Param,
-} from '@nestjs/common';
-import { Request } from 'express';
+import { AuthData, AuthGuard, SecretsService } from '@master-diploma/library';
+import { Body, Controller, Post, UseGuards, Get, Param } from '@nestjs/common';
 import { SecretDto } from '../dto/secret.dto';
+import { AuthDataI } from '@master-diploma/shared-resources';
 
 @Controller('secrets')
 export class SecretsController {
@@ -17,8 +9,8 @@ export class SecretsController {
 
   @Get('all')
   @UseGuards(AuthGuard)
-  getAllSecrets(@Req() req: Request) {
-    return this.secretsService.getAllSecrets((req as any).user.projectId);
+  getAllSecrets(@AuthData() { projectId }: AuthDataI) {
+    return this.secretsService.getAllSecrets(projectId);
   }
 
   @Get('all/:namespaceId')
@@ -30,13 +22,13 @@ export class SecretsController {
   @Post()
   @UseGuards(AuthGuard)
   async insert(
-    @Req() req: Request,
+    @AuthData() { projectId }: AuthDataI,
     @Body() { name, encryptedValue, namespaceId }: SecretDto
   ) {
     await this.secretsService.insert(
       name,
       encryptedValue,
-      (req as any).user.projectId,
+      projectId,
       namespaceId
     );
   }

@@ -12,6 +12,7 @@ import {
   REQUEST_RATE_LIMIT,
   REQUEST_RATE_TTL,
 } from '@master-diploma/shared-resources';
+import { SecurityController } from './controllers/security.controller';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import {
     NamespacesController,
     SecretsController,
     PermissionsController,
+    SecurityController
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

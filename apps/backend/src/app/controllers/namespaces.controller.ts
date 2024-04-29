@@ -1,13 +1,14 @@
 import {
+  AuthData,
   AuthGuard,
   CasbinService,
   NamespacesService,
   SecurityKeysService,
 } from '@master-diploma/library';
-import { Body, Controller, Post, UseGuards, Req, Get } from '@nestjs/common';
-import { Request } from 'express';
+import { Body, Controller, Post, UseGuards, Get } from '@nestjs/common';
 import { NamespaceDto } from '../dto/namespace.dto';
 import { ApiCookieAuth } from '@nestjs/swagger';
+import { AuthDataI } from '@master-diploma/shared-resources';
 
 @ApiCookieAuth()
 @Controller('namespaces')
@@ -20,19 +21,12 @@ export class NamespacesController {
   ) {}
 
   @Get('all')
-  async findByProjectId(@Req() req: Request) {
-    const namespaces = await this.namespacesService.findByProjectId(
-      (req as any).user.projectId
-    );
+  async findByProjectId(@AuthData() { sub, projectId }: AuthDataI) {
+    const namespaces = await this.namespacesService.findByProjectId(projectId);
 
     const rights = await Promise.all(
       namespaces.map((n) =>
-        this.casbinService.enforce(
-          (req as any).user.sub,
-          n.id,
-          'read',
-          (req as any).user.projectId
-        )
+        this.casbinService.enforce(sub, n.id, 'read', projectId)
       )
     );
 
@@ -42,8 +36,8 @@ export class NamespacesController {
       if (rights[i]) result.push(namespaces[i]);
 
     const securityKeys = await this.securityKeysService.findByProjectId(
-      (req as any).user.sub,
-      (req as any).user.projectId
+      sub,
+      projectId
     );
 
     return result.map((n) => ({
@@ -55,23 +49,16 @@ export class NamespacesController {
 
   @Post()
   async insert(
-    @Req() req: Request,
+    @AuthData() { sub, projectId }: AuthDataI,
     @Body() { name, parentId, encryptedSecurityKey }: NamespaceDto
   ) {
-    await this.namespacesService.insert(
-      name,
-      (req as any).user.projectId,
-      parentId
-    );
+    await this.namespacesService.insert(name, projectId, parentId);
 
-    const namespace = await this.namespacesService.findOne(
-      name,
-      (req as any).user.projectId
-    );
+    const namespace = await this.namespacesService.findOne(name, projectId);
 
     await this.securityKeysService.insert(
-      (req as any).user.sub,
-      (req as any).user.projectId,
+      sub,
+      projectId,
       namespace?.id,
       encryptedSecurityKey
     );

@@ -3,6 +3,7 @@ import { UsersService } from './users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ProjectsService } from './projects.service';
 import { CasbinService } from '../casbin/casbin.service';
+import { AuthDataI } from '@master-diploma/shared-resources';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +25,12 @@ export class AuthService {
     );
     if (!hasRoleInProject) throw new UnauthorizedException();
 
-    const payload = { sub: user.id, projectId: project.id, email, projectName };
+    const payload: AuthDataI = {
+      sub: user.id,
+      projectId: project.id,
+      email,
+      projectName,
+    };
     return this.jwtService.signAsync(payload);
   }
 }
