@@ -13,7 +13,10 @@ import { RolesPolicies } from './RolesPolicies';
 import { Role } from './Role';
 import { Audit } from './Audit';
 
-axios.defaults.baseURL = 'http://localhost:3001';
+axios.defaults.baseURL =
+  process.env.NODE_ENV === 'production'
+    ? `${window.location.protocol}//${window.location.host}/api`
+    : 'http://localhost:3001/api';
 
 const GlobalStyle = css`
   * {

@@ -11,14 +11,11 @@ services:
   - app: backend
 
 ingresses:
-  - service: frontend
+  - service: backend
     host: localhost
     paths:
-      - /
-      - /favicon{whatever:.*}
-      - /runtime{whatever:.*}
-      - /main{whatever:.*}
-  - service: backend
+      - /api{whatever:.*}
+  - service: frontend
     host: localhost
     paths:
       - /{whatever:.+}

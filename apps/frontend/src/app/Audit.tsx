@@ -10,7 +10,7 @@ export const Audit = () => {
       try {
         const audit = await axios('/other/audit');
         const response = await axios('/members');
-        setData(audit.data);
+        setData(audit.data.reverse());
         setUsers(response.data);
       } catch (error) {
         console.error('Error fetching namespaces:', error);
