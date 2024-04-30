@@ -1,8 +1,0 @@
-{
-  "name": "library",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/library/src",
-  "projectType": "libs/library",
-  "targets": {},
-  "tags": []
-}

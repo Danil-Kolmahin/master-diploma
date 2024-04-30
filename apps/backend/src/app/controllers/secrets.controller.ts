@@ -1,8 +1,10 @@
-import { AuthData, AuthGuard, SecretsService } from '@master-diploma/library';
 import { Body, Controller, Post, UseGuards, Get } from '@nestjs/common';
-import { SecretDto } from '../dto/secret.dto';
+import { SecretDto } from '../dtos/secret.dto';
 import { AuthDataI } from '@master-diploma/shared-resources';
 import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '../guards/auth.guard';
+import { SecretsService } from '../services/secrets.service';
+import { AuthData } from '../decorators/auth-data.decorator';
 
 @ApiCookieAuth()
 @UseGuards(AuthGuard)

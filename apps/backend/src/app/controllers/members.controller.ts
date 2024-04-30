@@ -1,14 +1,4 @@
 import {
-  AuthData,
-  AuthGuard,
-  CasbinService,
-  InvitesService,
-  ProjectsService,
-  SecurityKeysService,
-  SignUpDto,
-  UsersService,
-} from '@master-diploma/library';
-import {
   Body,
   Controller,
   Get,
@@ -24,10 +14,18 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { InviteDto } from '../dto/invite.dto';
+import { InviteDto } from '../dtos/invite.dto';
 import { randomBytes } from 'crypto';
 import { AuthDataI } from '@master-diploma/shared-resources';
-import { ChangeUserRoleDto } from '../dto/roles.dto';
+import { ChangeUserRoleDto } from '../dtos/roles.dto';
+import { UsersService } from '../services/users.service';
+import { ProjectsService } from '../services/projects.service';
+import { InvitesService } from '../services/invites.service';
+import { CasbinService } from '../casbin/casbin.service';
+import { SecurityKeysService } from '../services/security-key.service';
+import { AuthGuard } from '../guards/auth.guard';
+import { AuthData } from '../decorators/auth-data.decorator';
+import { SignUpDto } from '../dtos/sign-up.dto';
 
 @ApiTags('members')
 @Controller('members')

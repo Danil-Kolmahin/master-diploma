@@ -1,15 +1,4 @@
 import {
-  AuthGuard,
-  AuthService,
-  ChallengesService,
-  ProjectsService,
-  SignInAndVerifyChallengeDto,
-  SignInDto,
-  UsersService,
-  CasbinService,
-  AuthData,
-} from '@master-diploma/library';
-import {
   Body,
   Controller,
   Post,
@@ -27,6 +16,14 @@ import {
   COOKIE_OPTIONS,
 } from '@master-diploma/shared-resources';
 import { ApiCookieAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { UsersService } from '../services/users.service';
+import { AuthService } from '../services/auth.service';
+import { ProjectsService } from '../services/projects.service';
+import { ChallengesService } from '../services/challenge.service';
+import { CasbinService } from '../casbin/casbin.service';
+import { AuthGuard } from '../guards/auth.guard';
+import { AuthData } from '../decorators/auth-data.decorator';
+import { SignInAndVerifyChallengeDto, SignInDto } from '../dtos/sign-in.dto';
 
 @ApiTags('auth')
 @Controller('auth')

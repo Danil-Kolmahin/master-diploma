@@ -1,7 +1,9 @@
-import { AuthData, AuthGuard, TracesService } from '@master-diploma/library';
 import { AuthDataI } from '@master-diploma/shared-resources';
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '../guards/auth.guard';
+import { TracesService } from '../services/traces.service';
+import { AuthData } from '../decorators/auth-data.decorator';
 
 @ApiCookieAuth()
 @UseGuards(AuthGuard)

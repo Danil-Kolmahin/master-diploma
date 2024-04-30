@@ -1,10 +1,4 @@
 import {
-  AuthData,
-  AuthGuard,
-  CasbinService,
-  SecurityKeysService,
-} from '@master-diploma/library';
-import {
   Controller,
   UseGuards,
   Get,
@@ -13,9 +7,13 @@ import {
   Body,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AddRoleDto } from '../dto/roles.dto';
+import { AddRoleDto } from '../dtos/roles.dto';
 import { AuthDataI } from '@master-diploma/shared-resources';
 import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '../guards/auth.guard';
+import { CasbinService } from '../casbin/casbin.service';
+import { SecurityKeysService } from '../services/security-key.service';
+import { AuthData } from '../decorators/auth-data.decorator';
 
 @ApiCookieAuth()
 @UseGuards(AuthGuard)
