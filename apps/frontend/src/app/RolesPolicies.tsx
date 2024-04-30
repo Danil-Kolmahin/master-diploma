@@ -76,7 +76,10 @@ export const RolesPolicies = () => {
   return (
     <PlotContainer>
       {data.map((role: string) => (
-        <SecretTextDiv key={role}>
+        <SecretTextDiv
+          key={role}
+          onClick={() => navigate(`/roles-policies/${role}`)}
+        >
           <SecretText>
             <SecretNameText>{role}</SecretNameText>
           </SecretText>

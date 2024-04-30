@@ -54,13 +54,23 @@ export const Role = () => {
   useEffect(() => {
     const fetchNamespaces = async () => {
       try {
-        const response = await axios('/namespaces');
-        const formattedNamespaces = response.data.map((namespace: any) => ({
+        const { data: namespaces } = await axios('/namespaces');
+        const { data: role } = await axios(`/roles/${roleName}`);
+        const formattedNamespaces = namespaces.map((namespace: any) => ({
           ...namespace,
           permissions: {
-            read: false,
-            write: false,
-            delete: false,
+            read: !!role.find(
+              (policy: any) =>
+                policy[0] === namespace.id && policy[1] === 'read'
+            ),
+            write: !!role.find(
+              (policy: any) =>
+                policy[0] === namespace.id && policy[1] === 'write'
+            ),
+            delete: !!role.find(
+              (policy: any) =>
+                policy[0] === namespace.id && policy[1] === 'delete'
+            ),
           },
         }));
         setNamespaces(formattedNamespaces);
