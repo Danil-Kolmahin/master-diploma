@@ -225,8 +225,8 @@ export const NamespacesSecrets = () => {
   useEffect(() => {
     (async () => {
       try {
-        const namespaces = (await axios('/namespaces/all')).data;
-        const secrets = (await axios('/secrets/all')).data;
+        const namespaces = (await axios('/namespaces')).data;
+        const secrets = (await axios('/secrets')).data;
 
         const namespaceMap: any = new Map(
           namespaces.map((ns: any) => [

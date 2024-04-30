@@ -54,7 +54,7 @@ export const Role = () => {
   useEffect(() => {
     const fetchNamespaces = async () => {
       try {
-        const response = await axios('/namespaces/all');
+        const response = await axios('/namespaces');
         const formattedNamespaces = response.data.map((namespace: any) => ({
           ...namespace,
           permissions: {

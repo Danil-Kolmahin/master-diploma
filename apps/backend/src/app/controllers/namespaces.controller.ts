@@ -7,12 +7,13 @@ import {
 } from '@master-diploma/library';
 import { Body, Controller, Post, UseGuards, Get } from '@nestjs/common';
 import { NamespaceDto } from '../dto/namespace.dto';
-import { ApiCookieAuth } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 import { AuthDataI } from '@master-diploma/shared-resources';
 
 @ApiCookieAuth()
-@Controller('namespaces')
 @UseGuards(AuthGuard)
+@ApiTags('namespaces')
+@Controller('namespaces')
 export class NamespacesController {
   constructor(
     private readonly namespacesService: NamespacesService,
@@ -20,7 +21,7 @@ export class NamespacesController {
     private readonly securityKeysService: SecurityKeysService
   ) {}
 
-  @Get('all')
+  @Get()
   async findByProjectId(@AuthData() { sub, projectId }: AuthDataI) {
     const namespaces = await this.namespacesService.findByProjectId(projectId);
 

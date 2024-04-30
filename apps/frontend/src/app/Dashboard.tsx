@@ -21,8 +21,8 @@ export const Dashboard = () => {
 
   useEffect(() => {
     (async () => {
-      const allNamespacesRes = await axios('/namespaces/all');
-      const allSecretsRes = await axios('/secrets/all');
+      const allNamespacesRes = await axios('/namespaces');
+      const allSecretsRes = await axios('/secrets');
 
       setNamespaces(allNamespacesRes.data);
       setSecrets(allSecretsRes.data);
