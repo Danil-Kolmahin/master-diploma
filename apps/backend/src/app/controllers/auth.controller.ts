@@ -20,7 +20,7 @@ import { UsersService } from '../services/users.service';
 import { AuthService } from '../services/auth.service';
 import { ProjectsService } from '../services/projects.service';
 import { ChallengesService } from '../services/challenge.service';
-import { CasbinService } from '../casbin/casbin.service';
+import { CasbinService } from '../services/casbin.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { AuthData } from '../decorators/auth-data.decorator';
 import { SignInAndVerifyChallengeDto, SignInDto } from '../dtos/sign-in.dto';

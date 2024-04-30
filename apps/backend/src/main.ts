@@ -1,11 +1,14 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import cookieParser from 'cookie-parser';
-import { AppModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { COOKIE_NAME } from '@master-diploma/shared-resources';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import { join } from 'path';
+
+import { COOKIE_NAME } from '@master-diploma/shared-resources';
+
+import { AppModule } from './app/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -22,6 +25,9 @@ async function bootstrap() {
     })
   );
   app.use(cookieParser());
+
+  app.useStaticAssets(join(__dirname, 'assets'));
+  app.setBaseViewsDir(join(__dirname, 'assets'));
 
   const config = new DocumentBuilder()
     .setTitle('SMS API')

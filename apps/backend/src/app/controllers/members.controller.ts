@@ -21,7 +21,7 @@ import { ChangeUserRoleDto } from '../dtos/roles.dto';
 import { UsersService } from '../services/users.service';
 import { ProjectsService } from '../services/projects.service';
 import { InvitesService } from '../services/invites.service';
-import { CasbinService } from '../casbin/casbin.service';
+import { CasbinService } from '../services/casbin.service';
 import { SecurityKeysService } from '../services/security-key.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { AuthData } from '../decorators/auth-data.decorator';

@@ -11,7 +11,7 @@ import { AddRoleDto } from '../dtos/roles.dto';
 import { AuthDataI } from '@master-diploma/shared-resources';
 import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../guards/auth.guard';
-import { CasbinService } from '../casbin/casbin.service';
+import { CasbinService } from '../services/casbin.service';
 import { SecurityKeysService } from '../services/security-key.service';
 import { AuthData } from '../decorators/auth-data.decorator';
 

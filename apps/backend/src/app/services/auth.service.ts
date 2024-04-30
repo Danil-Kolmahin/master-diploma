@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ProjectsService } from './projects.service';
-import { CasbinService } from '../casbin/casbin.service';
+import { CasbinService } from './casbin.service';
 import { AuthDataI } from '@master-diploma/shared-resources';
 
 @Injectable()

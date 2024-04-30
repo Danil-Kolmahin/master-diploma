@@ -4,7 +4,7 @@ import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 import { AuthDataI } from '@master-diploma/shared-resources';
 import { AuthGuard } from '../guards/auth.guard';
 import { NamespacesService } from '../services/namespaces.service';
-import { CasbinService } from '../casbin/casbin.service';
+import { CasbinService } from '../services/casbin.service';
 import { SecurityKeysService } from '../services/security-key.service';
 import { AuthData } from '../decorators/auth-data.decorator';
 

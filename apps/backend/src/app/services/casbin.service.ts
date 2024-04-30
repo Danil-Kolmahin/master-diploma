@@ -1,12 +1,11 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { newEnforcer, Enforcer } from 'casbin';
 import TypeORMAdapter from 'typeorm-adapter';
-import { Rule } from './casbin.entity';
+import { Rule } from '../entities/casbin.entity';
 import { DataSource } from 'typeorm';
-import { writeFile } from 'fs/promises';
-import model from './rbac.model';
 import { User } from '../entities/user.entity';
-import { UsersService } from '../services/users.service';
+import { UsersService } from './users.service';
+import { resolve } from 'path';
 
 @Injectable()
 export class CasbinService implements OnApplicationBootstrap {
@@ -29,8 +28,10 @@ export class CasbinService implements OnApplicationBootstrap {
       { connection: dataSource },
       { customCasbinRuleEntity: Rule }
     );
-    await writeFile('./rbac_model.conf', model);
-    this.enforcer = await newEnforcer('./rbac_model.conf', adapter);
+    this.enforcer = await newEnforcer(
+      resolve(__dirname, 'assets/casbin_model.conf'),
+      adapter
+    );
   }
 
   async enforce(
