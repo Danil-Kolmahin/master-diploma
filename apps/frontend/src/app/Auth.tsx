@@ -94,7 +94,7 @@ export const Auth = () => {
       try {
         let keyPair: CryptoKeyPair | null = await generateKeyPair();
         await axios.post(
-          '/sign-up',
+          'members',
           {
             email,
             publicKey: await extractPublicKey(keyPair.publicKey),

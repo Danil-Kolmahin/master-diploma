@@ -61,7 +61,7 @@ export const PrivateKeyCatcher = () => {
         saveToDB(privateKey);
 
         const encryptedChallenge = (
-          await axios.post('/sign-in/challenge-request', {
+          await axios.post('/auth/challenge', {
             email,
             projectName,
           })
@@ -77,7 +77,7 @@ export const PrivateKeyCatcher = () => {
           )
         );
 
-        await axios.post('/sign-in/challenge-response', {
+        await axios.post('/auth/session', {
           email,
           projectName,
           challenge,

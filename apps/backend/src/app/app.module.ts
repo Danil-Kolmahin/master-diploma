@@ -5,7 +5,7 @@ import { SystemController } from './controllers/system.controller';
 import { AuthController } from './controllers/auth.controller';
 import { NamespacesController } from './controllers/namespaces.controller';
 import { SecretsController } from './controllers/secrets.controller';
-import { PermissionsController } from './controllers/permissions.controller';
+import { RolesController } from './controllers/roles.controller';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import {
@@ -13,6 +13,7 @@ import {
   REQUEST_RATE_TTL,
 } from '@master-diploma/shared-resources';
 import { SecurityController } from './controllers/security.controller';
+import { MembersController } from './controllers/members.controller';
 
 @Module({
   imports: [
@@ -35,8 +36,9 @@ import { SecurityController } from './controllers/security.controller';
     AuthController,
     NamespacesController,
     SecretsController,
-    PermissionsController,
-    SecurityController
+    RolesController,
+    SecurityController,
+    MembersController,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

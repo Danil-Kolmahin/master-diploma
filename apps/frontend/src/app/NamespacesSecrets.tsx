@@ -82,10 +82,23 @@ export const NamespacesSecrets = () => {
   const [data, setData] = useState<any>([]);
   const [inputs, setInputs] = useState({});
   const [newNamespaceName, setNewNamespaceName] = useState('');
-  const { publicKey } = useOutletContext<{ publicKey: string }>();
+  const { sub } = useOutletContext<{ sub: string }>();
   const [decryptedSecrets, setDecryptedSecrets] = useState<{
     [key: string]: string;
   }>({});
+  const [publicKey, setPublicKey] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const members = (await axios(`/members`)).data;
+        const user = members.find((member: any) => member.id === sub);
+        setPublicKey(user.publicKey);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, [sub]);
 
   const createNamespace = useCallback(
     async (name: string, publicKey: string, parentId?: string) => {

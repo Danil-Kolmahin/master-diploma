@@ -25,6 +25,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('SMS API')
+    .setVersion(process.env.npm_package_version || 'vx.x.x')
     .addCookieAuth(COOKIE_NAME)
     .build();
 

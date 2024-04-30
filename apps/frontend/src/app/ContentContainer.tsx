@@ -54,14 +54,14 @@ export const ContentContainer = () => {
 
   const signOut = useCallback(async () => {
     await deleteFromDB();
-    await axios('/sign-out');
+    await axios.delete('/auth/session');
     navigate('/auth');
   }, [navigate]);
 
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get('/profile');
+        const response = await axios.get('/auth/session');
         setData(response.data);
       } catch (error) {
         if (isAxiosError(error)) navigate('/auth');
@@ -74,7 +74,7 @@ export const ContentContainer = () => {
       const privateKeyExists = await getFromDB();
       if (privateKeyExists) {
         const encryptedChallenge = (
-          await axios.post('/sign-in/challenge-request', {
+          await axios.post('/auth/challenge', {
             email: (data as any).email,
             projectName: (data as any).projectName,
           })
@@ -90,7 +90,7 @@ export const ContentContainer = () => {
           )
         );
 
-        await axios.post('/sign-in/challenge-response', {
+        await axios.post('/auth/session', {
           email: (data as any).email,
           projectName: (data as any).projectName,
           challenge,

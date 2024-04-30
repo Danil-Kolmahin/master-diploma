@@ -65,7 +65,7 @@ export const RolesPolicies = () => {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get('/roles');
+        const response = await axios.get('/roles/names');
         setData(response.data);
       } catch (error) {
         console.log(error);

@@ -81,8 +81,11 @@ export const ProjectMembers = () => {
   }, []);
 
   const setRole = useCallback(async () => {
-    const user = (await axios(`/users/${newNamespaceName}`)).data;
-    const entities = (await axios(`/roles/${roleName}/security-keys`)).data;
+    const members = (await axios(`/members`)).data;
+    const user = members.find(
+      (member: any) => member.email === newNamespaceName
+    );
+    const entities = (await axios(`/roles/${roleName}/access-requirements`)).data;
     const privateKey = await getFromDB();
     const reEntities = await Promise.all(
       entities.map(async (entity: any) => {
@@ -130,10 +133,9 @@ export const ProjectMembers = () => {
         />
         <Button
           onClick={async () => {
-            const { data } = await axios.post('/invite', {
+            const { data } = await axios.post('/members/invites', {
               email: newNamespaceName,
               projectName,
-              roleName,
             });
             const link = `${window.location.protocol}//${window.location.host}${data}`;
             await navigator.clipboard.writeText(link);
