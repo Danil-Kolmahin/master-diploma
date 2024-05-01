@@ -58,7 +58,7 @@ const SecretNameText = styled(SecretText)`
 `;
 
 export const RolesPolicies = () => {
-  const [data, setData] = useState<string[]>([]);
+  const [rolesNames, setRolesNames] = useState<string[]>([]);
   const [newNamespaceName, setNewNamespaceName] = useState('');
   const navigate = useNavigate();
 
@@ -66,7 +66,7 @@ export const RolesPolicies = () => {
     (async () => {
       try {
         const response = await axios.get('/roles/names');
-        setData(response.data);
+        setRolesNames(response.data);
       } catch (error) {
         console.error(error);
       }
@@ -75,13 +75,13 @@ export const RolesPolicies = () => {
 
   return (
     <PlotContainer>
-      {data.map((role: string) => (
+      {rolesNames.map((roleName) => (
         <SecretTextDiv
-          key={role}
-          onClick={() => navigate(`/roles-policies/${role}`)}
+          key={roleName}
+          onClick={() => navigate(`/roles-policies/${roleName}`)}
         >
           <SecretText>
-            <SecretNameText>{role}</SecretNameText>
+            <SecretNameText>{roleName}</SecretNameText>
           </SecretText>
         </SecretTextDiv>
       ))}

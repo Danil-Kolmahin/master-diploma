@@ -1,7 +1,7 @@
 import { Body, Controller, Post, UseGuards, Get } from '@nestjs/common';
 import { NamespaceDto, NewNamespaceDto } from '../dtos/namespaces.dto';
 import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { AuthDataI } from '@master-diploma/shared-resources';
+import { AuthDataI, POLICY_ACTIONS } from '@master-diploma/shared-resources';
 import { AuthGuard } from '../guards/auth.guard';
 import { NamespacesService } from '../services/namespaces.service';
 import { CasbinService } from '../services/casbin.service';
@@ -28,7 +28,7 @@ export class NamespacesController {
 
     const rights = await Promise.all(
       namespaces.map((n) =>
-        this.casbinService.enforce(sub, n.id, 'read', projectId)
+        this.casbinService.enforce(sub, n.id, POLICY_ACTIONS.READ, projectId)
       )
     );
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled from '@emotion/styled';
 import { useParams } from 'react-router-dom';
+import { POLICY_ACTIONS } from '@master-diploma/shared-resources';
 
 const Table = styled.table`
   width: 80%;
@@ -61,17 +62,18 @@ export const Role = () => {
         const formattedNamespaces = namespaces.map((namespace: any) => ({
           ...namespace,
           permissions: {
-            read: !!policies.find(
+            [POLICY_ACTIONS.READ]: !!policies.find(
               (policy: any) =>
-                policy[0] === namespace.id && policy[1] === 'read'
+                policy[0] === namespace.id && policy[1] === POLICY_ACTIONS.READ
             ),
-            write: !!policies.find(
+            [POLICY_ACTIONS.WRITE]: !!policies.find(
               (policy: any) =>
-                policy[0] === namespace.id && policy[1] === 'write'
+                policy[0] === namespace.id && policy[1] === POLICY_ACTIONS.WRITE
             ),
-            delete: !!policies.find(
+            [POLICY_ACTIONS.DELETE]: !!policies.find(
               (policy: any) =>
-                policy[0] === namespace.id && policy[1] === 'delete'
+                policy[0] === namespace.id &&
+                policy[1] === POLICY_ACTIONS.DELETE
             ),
           },
         }));
@@ -107,9 +109,9 @@ export const Role = () => {
         <thead>
           <Tr>
             <Th>object</Th>
-            <Th>read</Th>
-            <Th>write</Th>
-            <Th>delete</Th>
+            <Th>{POLICY_ACTIONS.READ}</Th>
+            <Th>{POLICY_ACTIONS.WRITE}</Th>
+            <Th>{POLICY_ACTIONS.DELETE}</Th>
           </Tr>
         </thead>
         <tbody>
@@ -119,22 +121,28 @@ export const Role = () => {
               <Td>
                 <Input
                   type="checkbox"
-                  checked={namespace.permissions.read}
-                  onChange={() => togglePermission(namespace.id, 'read')}
+                  checked={namespace.permissions[POLICY_ACTIONS.READ]}
+                  onChange={() =>
+                    togglePermission(namespace.id, POLICY_ACTIONS.READ)
+                  }
                 />
               </Td>
               <Td>
                 <Input
                   type="checkbox"
-                  checked={namespace.permissions.write}
-                  onChange={() => togglePermission(namespace.id, 'write')}
+                  checked={namespace.permissions[POLICY_ACTIONS.WRITE]}
+                  onChange={() =>
+                    togglePermission(namespace.id, POLICY_ACTIONS.WRITE)
+                  }
                 />
               </Td>
               <Td>
                 <Input
                   type="checkbox"
-                  checked={namespace.permissions.delete}
-                  onChange={() => togglePermission(namespace.id, 'delete')}
+                  checked={namespace.permissions[POLICY_ACTIONS.DELETE]}
+                  onChange={() =>
+                    togglePermission(namespace.id, POLICY_ACTIONS.DELETE)
+                  }
                 />
               </Td>
             </Tr>
@@ -145,9 +153,12 @@ export const Role = () => {
         onClick={async () => {
           const policies = [];
           for (const { id, permissions } of namespaces) {
-            if (permissions.read) policies.push([id, 'read']);
-            if (permissions.write) policies.push([id, 'write']);
-            if (permissions.delete) policies.push([id, 'delete']);
+            if (permissions[POLICY_ACTIONS.READ])
+              policies.push([id, POLICY_ACTIONS.READ]);
+            if (permissions[POLICY_ACTIONS.WRITE])
+              policies.push([id, POLICY_ACTIONS.WRITE]);
+            if (permissions[POLICY_ACTIONS.DELETE])
+              policies.push([id, POLICY_ACTIONS.DELETE]);
           }
           await axios.post('/roles', { roleName, policies });
         }}

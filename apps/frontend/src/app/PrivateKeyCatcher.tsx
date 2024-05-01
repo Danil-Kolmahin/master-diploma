@@ -37,8 +37,9 @@ const Box = styled.div`
 const KeyButton = styled.label`
   border: none;
   background: none;
-  color: black;
   cursor: pointer;
+  color: black;
+  text-decoration: none;
   &:hover {
     text-decoration: underline;
     color: blue;

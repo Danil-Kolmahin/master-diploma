@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { NamespaceDtoI, SecretI } from '@master-diploma/shared-resources';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
@@ -12,20 +13,20 @@ const PlotContainer = styled.div`
 `;
 
 export const Dashboard = () => {
-  const [namespaces, setNamespaces] = useState<
-    { id: string; name: string; parentId: string }[]
-  >([]);
-  const [secrets, setSecrets] = useState<
-    { name: string; namespaceId: string }[]
-  >([]);
+  const [namespaces, setNamespaces] = useState<NamespaceDtoI[]>([]);
+  const [secrets, setSecrets] = useState<SecretI[]>([]);
 
   useEffect(() => {
     (async () => {
-      const allNamespacesRes = await axios('/namespaces');
-      const allSecretsRes = await axios('/secrets');
+      try {
+        const namespacesResponse = await axios('/namespaces');
+        const secretsResponse = await axios('/secrets');
 
-      setNamespaces(allNamespacesRes.data);
-      setSecrets(allSecretsRes.data);
+        setNamespaces(namespacesResponse.data);
+        setSecrets(secretsResponse.data);
+      } catch (error) {
+        console.error(error);
+      }
     })();
   }, []);
 

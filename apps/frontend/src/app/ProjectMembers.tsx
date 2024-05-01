@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
@@ -8,6 +8,10 @@ import {
   getPublicKeyFromString,
 } from './utils/key-pair';
 import { getFromDB } from './utils/indexed-db';
+import {
+  MembersDtoI,
+  EntitiesToReEncryptDtoI,
+} from '@master-diploma/shared-resources';
 
 const PlotContainer = styled.div`
   width: 100%;
@@ -64,7 +68,7 @@ const SecretNameText = styled(SecretText)`
 `;
 
 export const ProjectMembers = () => {
-  const [data, setData] = useState<any>([]);
+  const [members, setMembers] = useState<MembersDtoI[]>([]);
   const [newNamespaceName, setNewNamespaceName] = useState('');
   const [roleName, setRoleName] = useState('');
   const { projectName } = useOutletContext<{ projectName: string }>();
@@ -72,8 +76,10 @@ export const ProjectMembers = () => {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get('/members');
-        setData(response.data);
+        const membersResponse: AxiosResponse<MembersDtoI[]> = await axios.get(
+          '/members'
+        );
+        setMembers(membersResponse.data);
       } catch (error) {
         console.error(error);
       }
@@ -81,14 +87,15 @@ export const ProjectMembers = () => {
   }, []);
 
   const setRole = useCallback(async () => {
-    const members = (await axios(`/members`)).data;
     const user = members.find(
-      (member: any) => member.email === newNamespaceName
-    );
-    const entities = (await axios(`/roles/${roleName}/access-requirements`)).data;
+      (member) => member.email === newNamespaceName
+    ) as MembersDtoI;
+    const entities: EntitiesToReEncryptDtoI[] = (
+      await axios(`/roles/${roleName}/access-requirements`)
+    ).data;
     const privateKey = await getFromDB();
     const reEntities = await Promise.all(
-      entities.map(async (entity: any) => {
+      entities.map(async (entity) => {
         const symmetricKey = await decryptSymmetricKey(
           entity.encryptedSecurityKey,
           privateKey
@@ -108,15 +115,15 @@ export const ProjectMembers = () => {
       roleName,
       entities: reEntities,
     });
-  }, [newNamespaceName, roleName]);
+  }, [newNamespaceName, roleName, members]);
 
   return (
     <PlotContainer>
-      {data.map((user: any) => (
+      {members.map((user) => (
         <SecretTextDiv key={user.id}>
           <SecretText>
             <SecretNameText>{user.email}</SecretNameText> | {user.roleName} |{' '}
-            {user.createdAt}
+            {user.createdAt?.toString()}
           </SecretText>
         </SecretTextDiv>
       ))}

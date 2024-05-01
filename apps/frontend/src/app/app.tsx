@@ -6,17 +6,11 @@ import { NotFound } from './NotFound';
 import { PrivateKeyCatcher } from './PrivateKeyCatcher';
 import { Route, Routes } from 'react-router-dom';
 import { ContentContainer } from './ContentContainer';
-import axios from 'axios';
 import { NamespacesSecrets } from './NamespacesSecrets';
 import { ProjectMembers } from './ProjectMembers';
 import { RolesPolicies } from './RolesPolicies';
 import { Role } from './Role';
 import { Audit } from './Audit';
-
-axios.defaults.baseURL =
-  process.env.NODE_ENV === 'production'
-    ? `${window.location.protocol}//${window.location.host}/api`
-    : 'http://localhost:3001/api';
 
 const GlobalStyle = css`
   * {

@@ -8,6 +8,7 @@ import {
 } from './utils/key-pair';
 import { saveFile } from './utils/file-management';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Button } from './styles/styles';
 
 const Container = styled.div`
   display: flex;
@@ -55,19 +56,6 @@ const ButtonGroup = styled.div`
   align-items: center;
 `;
 
-const Button = styled.button`
-  border: none;
-  background: none;
-  cursor: pointer;
-  color: black;
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
-    color: blue;
-    outline: none;
-  }
-`;
-
 const Divider = styled.span`
   margin: 0 15px;
 `;
@@ -79,13 +67,8 @@ export const Auth = () => {
   const navigate = useNavigate();
 
   const signIn = useCallback(
-    async (email: string, projectName: string) => {
-      try {
-        navigate(`/private-key-catcher/${email}/${projectName}`);
-      } catch (error) {
-        console.error(error);
-      }
-    },
+    (email: string, projectName: string) =>
+      navigate(`/private-key-catcher/${email}/${projectName}`),
     [navigate]
   );
 

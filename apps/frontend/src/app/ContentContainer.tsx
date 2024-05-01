@@ -3,7 +3,7 @@ import axios, { isAxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { deleteFromDB, getFromDB } from './utils/indexed-db';
-import { ACCESS_TIME } from '@master-diploma/shared-resources';
+import { ACCESS_TIME, AuthDataI } from '@master-diploma/shared-resources';
 
 const Sidebar = styled.div`
   display: table-cell;
@@ -50,7 +50,7 @@ const SidebarItemLink = styled(NavLink)`
 
 export const ContentContainer = () => {
   const navigate = useNavigate();
-  const [data, setData] = useState({});
+  const [session, setSession] = useState<AuthDataI>();
 
   const signOut = useCallback(async () => {
     await deleteFromDB();
@@ -62,9 +62,10 @@ export const ContentContainer = () => {
     (async () => {
       try {
         const response = await axios.get('/auth/session');
-        setData(response.data);
+        setSession(response.data);
       } catch (error) {
-        if (isAxiosError(error)) navigate('/auth');
+        if (isAxiosError(error) && error.status === 401) navigate('/auth');
+        else console.error(error);
       }
     })();
   }, [navigate]);
@@ -75,8 +76,8 @@ export const ContentContainer = () => {
       if (privateKeyExists) {
         const encryptedChallenge = (
           await axios.post('/auth/challenge', {
-            email: (data as any).email,
-            projectName: (data as any).projectName,
+            email: session?.email,
+            projectName: session?.projectName,
           })
         ).data;
 
@@ -91,15 +92,15 @@ export const ContentContainer = () => {
         );
 
         await axios.post('/auth/session', {
-          email: (data as any).email,
-          projectName: (data as any).projectName,
+          email: session?.email,
+          projectName: session?.projectName,
           challenge,
         });
       } else signOut();
     }, ACCESS_TIME - 60 * 1000);
 
     return () => clearInterval(interval);
-  }, [signOut, data]);
+  }, [signOut, session]);
 
   useEffect(() => {
     let logoutTimer = setTimeout(signOut, ACCESS_TIME);
@@ -124,8 +125,8 @@ export const ContentContainer = () => {
   return (
     <>
       <Sidebar>
-        <SidebarItem>{(data as any).email}</SidebarItem>
-        <SidebarItem>{(data as any).projectName}</SidebarItem>
+        <SidebarItem>{session?.email}</SidebarItem>
+        <SidebarItem>{session?.projectName}</SidebarItem>
         <hr />
         <SidebarItemLink to="/">dashboard</SidebarItemLink>
         <SidebarItemLink to="/namespaces-secrets">
@@ -139,7 +140,7 @@ export const ContentContainer = () => {
         </SidebarItemLink>
       </Sidebar>
       <Content>
-        <Outlet context={data} />
+        <Outlet context={session} />
       </Content>
     </>
   );

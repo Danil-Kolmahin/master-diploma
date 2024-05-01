@@ -12,7 +12,7 @@ import {
   EntitiesToReEncryptDto,
   RoleContentDto,
 } from '../dtos/roles.dto';
-import { AuthDataI } from '@master-diploma/shared-resources';
+import { AuthDataI, POLICY_ACTIONS } from '@master-diploma/shared-resources';
 import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../guards/auth.guard';
 import { CasbinService } from '../services/casbin.service';
@@ -68,7 +68,7 @@ export class RolesController {
       projectId
     );
     const response: EntitiesToReEncryptDto[] = rolePolicies
-      .filter(([, action]) => action === 'read')
+      .filter(([, action]) => action === POLICY_ACTIONS.READ)
       .map(([object]) => ({
         entityId: object,
         encryptedSecurityKey: securityKeys.find(
