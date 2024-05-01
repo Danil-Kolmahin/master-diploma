@@ -50,7 +50,7 @@ const SidebarItemLink = styled(NavLink)`
 
 export const ContentContainer = () => {
   const navigate = useNavigate();
-  const [session, setSession] = useState<AuthDataI>();
+  const [session, setSession] = useState<AuthDataI>({} as AuthDataI);
 
   const signOut = useCallback(async () => {
     await deleteFromDB();
@@ -64,7 +64,8 @@ export const ContentContainer = () => {
         const response = await axios.get('/auth/session');
         setSession(response.data);
       } catch (error) {
-        if (isAxiosError(error) && error.status === 401) navigate('/auth');
+        if (isAxiosError(error) && error.response?.status === 401)
+          navigate('/auth');
         else console.error(error);
       }
     })();

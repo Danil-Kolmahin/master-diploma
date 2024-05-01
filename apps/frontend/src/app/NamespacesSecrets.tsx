@@ -11,6 +11,11 @@ import {
 } from './utils/key-pair';
 import { useOutletContext } from 'react-router-dom';
 import { getFromDB } from './utils/indexed-db';
+import {
+  AuthDataI,
+  NamespaceDtoI,
+  SecretI,
+} from '@master-diploma/shared-resources';
 
 const NamespacePath = styled.span`
   font-size: 18px;
@@ -62,8 +67,8 @@ const Button = styled.button`
   }
 `;
 
-const IndentDiv: any = styled.div`
-  margin-left: ${(props: any) => props.level * 15}px;
+const IndentDiv = styled.div`
+  margin-left: ${(props: { level: number }) => props.level * 15}px;
 `;
 
 const SecretTextDiv = styled.div`
@@ -78,11 +83,16 @@ const SecretNameText = styled(SecretText)`
   font-weight: bold;
 `;
 
+interface NamespaceTreeI extends NamespaceDtoI {
+  children: NamespaceDtoI[];
+  secrets: SecretI[];
+}
+
 export const NamespacesSecrets = () => {
-  const [data, setData] = useState<any>([]);
+  const [namespacesTree, setNamespacesTree] = useState<NamespaceTreeI[]>([]);
   const [inputs, setInputs] = useState({});
   const [newNamespaceName, setNewNamespaceName] = useState('');
-  const { sub } = useOutletContext<{ sub: string }>();
+  const { sub } = useOutletContext<AuthDataI>();
   const [decryptedSecrets, setDecryptedSecrets] = useState<{
     [key: string]: string;
   }>({});
@@ -238,34 +248,34 @@ export const NamespacesSecrets = () => {
   useEffect(() => {
     (async () => {
       try {
-        const namespaces = (await axios('/namespaces')).data;
-        const secrets = (await axios('/secrets')).data;
+        const namespaces: NamespaceDtoI[] = (await axios('/namespaces')).data;
+        const secrets: SecretI[] = (await axios('/secrets')).data;
 
-        const namespaceMap: any = new Map(
-          namespaces.map((ns: any) => [
-            ns.id,
-            { ...ns, children: [], secrets: [] },
-          ])
+        const namespaceMap: Record<string, NamespaceTreeI> = namespaces.reduce(
+          (acc, cur) => ({
+            ...acc,
+            [cur.id]: { ...cur, children: [], secrets: [] },
+          }),
+          {}
         );
 
-        secrets.forEach((secret: any) => {
-          if (namespaceMap.has(secret.namespaceId))
-            namespaceMap.get(secret.namespaceId).secrets.push(secret);
+        secrets.forEach((secret) => {
+          if (namespaceMap[secret.namespaceId])
+            namespaceMap[secret.namespaceId].secrets.push(secret);
         });
 
-        const tree: any = [];
-        namespaceMap.forEach((ns: any) => {
+        const tree: NamespaceTreeI[] = [];
+        Object.values(namespaceMap).forEach((ns) => {
           if (ns.parentId === null) tree.push(ns);
           else {
-            if (namespaceMap.has(ns.parentId)) {
-              const parentNs = namespaceMap.get(ns.parentId);
+            if (namespaceMap[ns.parentId || '']) {
+              const parentNs = namespaceMap[ns.parentId || ''];
               if (!parentNs.children) parentNs.children = [];
               parentNs.children.push(ns);
             }
           }
         });
-
-        setData(tree);
+        setNamespacesTree(tree);
       } catch (error) {
         console.error(error);
       }
@@ -274,7 +284,7 @@ export const NamespacesSecrets = () => {
 
   return (
     <PageBock>
-      {data.map((child: any) => renderNamespace(child, 1, ''))}
+      {namespacesTree.map((child) => renderNamespace(child, 1, ''))}
       <NamespaceBlock>
         <NamespaceNameInput
           value={newNamespaceName}
