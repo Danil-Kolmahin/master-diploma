@@ -13,6 +13,7 @@ import { useOutletContext } from 'react-router-dom';
 import { getFromDB } from './utils/indexed-db';
 import {
   AuthDataI,
+  MembersDtoI,
   NamespaceDtoI,
   SecretI,
 } from '@master-diploma/shared-resources';
@@ -84,13 +85,15 @@ const SecretNameText = styled(SecretText)`
 `;
 
 interface NamespaceTreeI extends NamespaceDtoI {
-  children: NamespaceDtoI[];
+  children: NamespaceTreeI[];
   secrets: SecretI[];
 }
 
 export const NamespacesSecrets = () => {
   const [namespacesTree, setNamespacesTree] = useState<NamespaceTreeI[]>([]);
-  const [inputs, setInputs] = useState({});
+  const [inputs, setInputs] = useState<{
+    [key: string]: { name: string; value: string };
+  }>({});
   const [newNamespaceName, setNewNamespaceName] = useState('');
   const { sub } = useOutletContext<AuthDataI>();
   const [decryptedSecrets, setDecryptedSecrets] = useState<{
@@ -101,8 +104,8 @@ export const NamespacesSecrets = () => {
   useEffect(() => {
     (async () => {
       try {
-        const members = (await axios(`/members`)).data;
-        const user = members.find((member: any) => member.id === sub);
+        const members: MembersDtoI[] = (await axios(`/members`)).data;
+        const user = members.find((member) => member.id === sub) as MembersDtoI;
         setPublicKey(user.publicKey);
       } catch (error) {
         console.error(error);
@@ -158,25 +161,21 @@ export const NamespacesSecrets = () => {
   );
 
   const renderNamespace = useCallback(
-    (namespace: any, level: number, path: string) => {
-      const handleChange = (id: any, type: any, value: any) => {
-        setInputs((prev: any) => ({
+    (namespace: NamespaceTreeI, level = 1, path = '') => {
+      const handleChange = (id: string, type: string, value: string) => {
+        setInputs((prev) => ({
           ...prev,
           [id]: { ...prev[id], [type]: value },
         }));
       };
 
       const handleCreateNamespace = (namespaceId: string) =>
-        createNamespace(
-          (inputs as any)[namespaceId]?.name,
-          publicKey,
-          namespaceId
-        );
+        createNamespace(inputs[namespaceId]?.name, publicKey, namespaceId);
 
       const handleCreateSecret = (namespaceId: string) =>
         createSecret(
-          (inputs as any)[namespaceId]?.name,
-          (inputs as any)[namespaceId]?.value,
+          inputs[namespaceId]?.name,
+          inputs[namespaceId]?.value,
           namespaceId,
           namespace.encryptedSecurityKey
         );
@@ -188,7 +187,7 @@ export const NamespacesSecrets = () => {
             <NamespaceName>{namespace.name}</NamespaceName>
           </NamespaceBlock>
           <IndentDiv level={level}>
-            {namespace.secrets.map((secret: any) => (
+            {namespace.secrets.map((secret) => (
               <SecretTextDiv key={secret.id}>
                 <SecretText
                   onClick={() =>
@@ -201,13 +200,13 @@ export const NamespacesSecrets = () => {
                 >
                   <SecretNameText>{secret.name}</SecretNameText> |{' '}
                   {decryptedSecrets[secret.id] || secret.encryptedValue} |{' '}
-                  {secret.createdAt}
+                  {secret.createdAt?.toString()}
                 </SecretText>
               </SecretTextDiv>
             ))}
             <div>
               <NamespaceNameInput
-                value={(inputs as any)[namespace.id]?.name || ''}
+                value={inputs[namespace.id]?.name || ''}
                 onChange={(e) =>
                   handleChange(namespace.id, 'name', e.target.value)
                 }
@@ -217,7 +216,7 @@ export const NamespacesSecrets = () => {
                 add namespace
               </Button>
               <Input
-                value={(inputs as any)[namespace.id]?.value || ''}
+                value={inputs[namespace.id]?.value || ''}
                 onChange={(e) =>
                   handleChange(namespace.id, 'value', e.target.value)
                 }
@@ -227,7 +226,7 @@ export const NamespacesSecrets = () => {
                 add secret
               </Button>
             </div>
-            {namespace.children.map((child: any) =>
+            {namespace.children.map((child) =>
               renderNamespace(child, level + 1, path + '/' + namespace.name)
             )}
           </IndentDiv>
@@ -284,7 +283,7 @@ export const NamespacesSecrets = () => {
 
   return (
     <PageBock>
-      {namespacesTree.map((child) => renderNamespace(child, 1, ''))}
+      {namespacesTree.map((child) => renderNamespace(child))}
       <NamespaceBlock>
         <NamespaceNameInput
           value={newNamespaceName}
