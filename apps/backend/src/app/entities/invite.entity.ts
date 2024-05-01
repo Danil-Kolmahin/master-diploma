@@ -1,17 +1,12 @@
 import { Column, Entity } from 'typeorm';
-import { BaseEntity } from './base.entity';
+import { Challenge } from './challenge.entity';
+import { InviteI } from '@master-diploma/shared-resources';
 
 @Entity()
-export class Invite extends BaseEntity {
-  @Column({ type: 'varchar', update: false })
-  body: string;
-
+export class Invite extends Challenge implements InviteI {
   @Column({ type: 'varchar', update: false })
   email: string;
 
   @Column({ type: 'varchar', update: false })
   projectName: string;
-
-  @Column({ type: 'timestamptz', update: false })
-  expiresAt: Date;
 }

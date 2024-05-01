@@ -95,7 +95,7 @@ export const NamespacesSecrets = () => {
         const user = members.find((member: any) => member.id === sub);
         setPublicKey(user.publicKey);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     })();
   }, [sub]);
@@ -267,7 +267,7 @@ export const NamespacesSecrets = () => {
 
         setData(tree);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     })();
   }, []);

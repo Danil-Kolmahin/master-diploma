@@ -10,4 +10,6 @@ export interface AuthDataI {
   projectId: string;
   email: string;
   projectName: string;
+  iat: number;
+  exp: number;
 }

@@ -55,19 +55,21 @@ export const Role = () => {
     const fetchNamespaces = async () => {
       try {
         const { data: namespaces } = await axios('/namespaces');
-        const { data: role } = await axios(`/roles/${roleName}`);
+        const {
+          data: { policies },
+        } = await axios(`/roles/${roleName}`);
         const formattedNamespaces = namespaces.map((namespace: any) => ({
           ...namespace,
           permissions: {
-            read: !!role.find(
+            read: !!policies.find(
               (policy: any) =>
                 policy[0] === namespace.id && policy[1] === 'read'
             ),
-            write: !!role.find(
+            write: !!policies.find(
               (policy: any) =>
                 policy[0] === namespace.id && policy[1] === 'write'
             ),
-            delete: !!role.find(
+            delete: !!policies.find(
               (policy: any) =>
                 policy[0] === namespace.id && policy[1] === 'delete'
             ),

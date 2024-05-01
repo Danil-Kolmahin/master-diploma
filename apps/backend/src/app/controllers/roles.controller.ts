@@ -7,9 +7,13 @@ import {
   Body,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AddRoleDto } from '../dtos/roles.dto';
+import {
+  AddRoleDto,
+  EntitiesToReEncryptDto,
+  RoleContentDto,
+} from '../dtos/roles.dto';
 import { AuthDataI } from '@master-diploma/shared-resources';
-import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../guards/auth.guard';
 import { CasbinService } from '../services/casbin.service';
 import { SecurityKeysService } from '../services/security-key.service';
@@ -26,31 +30,35 @@ export class RolesController {
   ) {}
 
   @Get('names')
-  getAllRolesNames(@AuthData() { projectId }: AuthDataI) {
+  @ApiOkResponse({ type: [String] })
+  getAllRolesNames(@AuthData() { projectId }: AuthDataI): Promise<string[]> {
     return this.casbinService.getAllRolesNames(projectId);
   }
 
   @Get(':name')
-  findRoleByName(
+  @ApiOkResponse({ type: RoleContentDto })
+  async findRoleByName(
     @AuthData() { projectId }: AuthDataI,
     @Param('name') name: string
-  ) {
-    return this.casbinService.findRoleByName(name, projectId);
+  ): Promise<RoleContentDto> {
+    const policies = await this.casbinService.findRoleByName(name, projectId);
+    return { policies };
   }
 
   @Post()
-  addRole(
+  async addRole(
     @AuthData() { projectId }: AuthDataI,
     @Body() { roleName, policies }: AddRoleDto
-  ) {
-    return this.casbinService.addRole(roleName, projectId, policies);
+  ): Promise<void> {
+    await this.casbinService.addRole(roleName, projectId, policies);
   }
 
   @Get(':name/access-requirements')
+  @ApiOkResponse({ type: [EntitiesToReEncryptDto] })
   async getRoleSecurityKeys(
     @AuthData() { sub, projectId }: AuthDataI,
     @Param('name') name: string
-  ) {
+  ): Promise<EntitiesToReEncryptDto[]> {
     const securityKeys = await this.securityKeysService.findByProjectId(
       sub,
       projectId
@@ -59,7 +67,7 @@ export class RolesController {
       name,
       projectId
     );
-    const response = rolePolicies
+    const response: EntitiesToReEncryptDto[] = rolePolicies
       .filter(([, action]) => action === 'read')
       .map(([object]) => ({
         entityId: object,

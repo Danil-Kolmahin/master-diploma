@@ -3,8 +3,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { BaseEntityI } from '@master-diploma/shared-resources';
 
-export abstract class BaseEntity {
+export abstract class BaseEntity implements BaseEntityI {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

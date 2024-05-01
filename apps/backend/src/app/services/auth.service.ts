@@ -25,7 +25,7 @@ export class AuthService {
     );
     if (!hasRoleInProject) throw new UnauthorizedException();
 
-    const payload: AuthDataI = {
+    const payload = {
       sub: user.id,
       projectId: project.id,
       email,

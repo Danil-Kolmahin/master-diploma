@@ -1,6 +1,6 @@
 import { Body, Controller, Post, UseGuards, Get } from '@nestjs/common';
-import { NamespaceDto } from '../dtos/namespace.dto';
-import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import { NamespaceDto, NewNamespaceDto } from '../dtos/namespaces.dto';
+import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthDataI } from '@master-diploma/shared-resources';
 import { AuthGuard } from '../guards/auth.guard';
 import { NamespacesService } from '../services/namespaces.service';
@@ -20,7 +20,10 @@ export class NamespacesController {
   ) {}
 
   @Get()
-  async findByProjectId(@AuthData() { sub, projectId }: AuthDataI) {
+  @ApiOkResponse({ type: [NamespaceDto] })
+  async findByProjectId(
+    @AuthData() { sub, projectId }: AuthDataI
+  ): Promise<NamespaceDto[]> {
     const namespaces = await this.namespacesService.findByProjectId(projectId);
 
     const rights = await Promise.all(
@@ -49,8 +52,8 @@ export class NamespacesController {
   @Post()
   async insert(
     @AuthData() { sub, projectId }: AuthDataI,
-    @Body() { name, parentId, encryptedSecurityKey }: NamespaceDto
-  ) {
+    @Body() { name, parentId, encryptedSecurityKey }: NewNamespaceDto
+  ): Promise<void> {
     await this.namespacesService.insert(name, projectId, parentId);
 
     const namespace = await this.namespacesService.findOne(name, projectId);

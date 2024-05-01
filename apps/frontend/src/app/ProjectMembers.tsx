@@ -75,7 +75,7 @@ export const ProjectMembers = () => {
         const response = await axios.get('/members');
         setData(response.data);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     })();
   }, []);
@@ -89,14 +89,10 @@ export const ProjectMembers = () => {
     const privateKey = await getFromDB();
     const reEntities = await Promise.all(
       entities.map(async (entity: any) => {
-        console.log(entity);
         const symmetricKey = await decryptSymmetricKey(
           entity.encryptedSecurityKey,
           privateKey
         );
-        console.log(symmetricKey);
-        console.log(user.publicKey);
-        console.log(await getPublicKeyFromString(user.publicKey));
         const reEncryptedSecurityKey = await encryptSymmetricKey(
           symmetricKey,
           await getPublicKeyFromString(user.publicKey)

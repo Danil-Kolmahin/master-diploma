@@ -15,7 +15,12 @@ import {
   COOKIE_NAME,
   COOKIE_OPTIONS,
 } from '@master-diploma/shared-resources';
-import { ApiCookieAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCookieAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UsersService } from '../services/users.service';
 import { AuthService } from '../services/auth.service';
 import { ProjectsService } from '../services/projects.service';
@@ -23,7 +28,8 @@ import { ChallengesService } from '../services/challenge.service';
 import { CasbinService } from '../services/casbin.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { AuthData } from '../decorators/auth-data.decorator';
-import { SignInAndVerifyChallengeDto, SignInDto } from '../dtos/sign-in.dto';
+import { AuthDataDto, SignInAndVerifyChallengeDto } from '../dtos/auth.dto';
+import { NewUserDto } from '../dtos/members.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -39,14 +45,15 @@ export class AuthController {
   @ApiCookieAuth()
   @UseGuards(AuthGuard)
   @Get('session')
-  getProfile(@AuthData() data: AuthDataI) {
+  @ApiOkResponse({ type: AuthDataDto })
+  getProfile(@AuthData() data: AuthDataI): AuthDataI {
     return data;
   }
 
   @Post('challenge')
   @ApiCreatedResponse({ type: String })
   async signInChallengeRequest(
-    @Body() { projectName, email }: SignInDto
+    @Body() { projectName, email }: NewUserDto
   ): Promise<string> {
     const user = await this.usersService.findOneByEmail(email);
     const project = await this.projectsService.findOneByName(projectName);

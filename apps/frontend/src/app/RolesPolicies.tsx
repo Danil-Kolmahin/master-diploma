@@ -68,7 +68,7 @@ export const RolesPolicies = () => {
         const response = await axios.get('/roles/names');
         setData(response.data);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     })();
   }, []);
