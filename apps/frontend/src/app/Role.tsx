@@ -1,8 +1,12 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect, useCallback } from 'react';
+import axios, { AxiosResponse } from 'axios';
 import styled from '@emotion/styled';
 import { useParams } from 'react-router-dom';
-import { POLICY_ACTIONS } from '@master-diploma/shared-resources';
+import {
+  NamespaceDtoI,
+  POLICY_ACTIONS,
+  RoleContentDtoI,
+} from '@master-diploma/shared-resources';
 
 const Table = styled.table`
   width: 80%;
@@ -48,60 +52,66 @@ const Button = styled.button`
   }
 `;
 
+type FormattedNamespacePermissionsI = {
+  [key in POLICY_ACTIONS]: boolean;
+};
+
+interface FormattedNamespaceI extends NamespaceDtoI {
+  permissions: FormattedNamespacePermissionsI;
+}
+
 export const Role = () => {
-  const [namespaces, setNamespaces] = useState<any[]>([]);
+  const [namespaces, setNamespaces] = useState<FormattedNamespaceI[]>([]);
   const { roleName } = useParams();
 
   useEffect(() => {
-    const fetchNamespaces = async () => {
+    (async () => {
       try {
-        const { data: namespaces } = await axios('/namespaces');
-        const {
-          data: { policies },
-        } = await axios(`/roles/${roleName}`);
-        const formattedNamespaces = namespaces.map((namespace: any) => ({
-          ...namespace,
-          permissions: {
-            [POLICY_ACTIONS.READ]: !!policies.find(
-              (policy: any) =>
-                policy[0] === namespace.id && policy[1] === POLICY_ACTIONS.READ
-            ),
-            [POLICY_ACTIONS.WRITE]: !!policies.find(
-              (policy: any) =>
-                policy[0] === namespace.id && policy[1] === POLICY_ACTIONS.WRITE
-            ),
-            [POLICY_ACTIONS.DELETE]: !!policies.find(
-              (policy: any) =>
-                policy[0] === namespace.id &&
-                policy[1] === POLICY_ACTIONS.DELETE
-            ),
-          },
-        }));
+        const namespacesResponse: AxiosResponse<NamespaceDtoI[]> = await axios(
+          '/namespaces'
+        );
+        const rolesContentResponse: AxiosResponse<RoleContentDtoI> =
+          await axios(`/roles/${roleName}`);
+        const { policies } = rolesContentResponse.data;
+        const formattedNamespaces = namespacesResponse.data.map(
+          (namespace) => ({
+            ...namespace,
+            permissions: Object.values(POLICY_ACTIONS).reduce(
+              (acc, cur) => ({
+                ...acc,
+                [cur]: !!policies.find(
+                  ([object, action]) =>
+                    object === namespace.id && action === cur
+                ),
+              }),
+              {}
+            ) as FormattedNamespacePermissionsI,
+          })
+        );
         setNamespaces(formattedNamespaces);
       } catch (error) {
-        console.error('Error fetching namespaces:', error);
+        console.error(error);
       }
-    };
+    })();
+  }, [roleName]);
 
-    fetchNamespaces();
-  }, []);
-
-  const togglePermission = (id: string, permission: any) => {
-    setNamespaces(
-      namespaces.map((namespace: any) => {
-        if (namespace.id === id) {
-          return {
-            ...namespace,
-            permissions: {
-              ...namespace.permissions,
-              [permission]: !namespace.permissions[permission],
-            },
-          };
-        }
-        return namespace;
-      })
-    );
-  };
+  const togglePermission = useCallback(
+    (id: string, action: POLICY_ACTIONS) =>
+      setNamespaces(
+        namespaces.map((namespace) =>
+          namespace.id === id
+            ? {
+                ...namespace,
+                permissions: {
+                  ...namespace.permissions,
+                  [action]: !namespace.permissions[action],
+                },
+              }
+            : namespace
+        )
+      ),
+    [namespaces]
+  );
 
   return (
     <div>
@@ -109,57 +119,38 @@ export const Role = () => {
         <thead>
           <Tr>
             <Th>object</Th>
-            <Th>{POLICY_ACTIONS.READ}</Th>
-            <Th>{POLICY_ACTIONS.WRITE}</Th>
-            <Th>{POLICY_ACTIONS.DELETE}</Th>
+            {Object.values(POLICY_ACTIONS).map((action) => (
+              <Th key={action}>{action}</Th>
+            ))}
           </Tr>
         </thead>
         <tbody>
           {namespaces.map((namespace) => (
             <Tr key={namespace.id}>
               <Td>{namespace.name}</Td>
-              <Td>
-                <Input
-                  type="checkbox"
-                  checked={namespace.permissions[POLICY_ACTIONS.READ]}
-                  onChange={() =>
-                    togglePermission(namespace.id, POLICY_ACTIONS.READ)
-                  }
-                />
-              </Td>
-              <Td>
-                <Input
-                  type="checkbox"
-                  checked={namespace.permissions[POLICY_ACTIONS.WRITE]}
-                  onChange={() =>
-                    togglePermission(namespace.id, POLICY_ACTIONS.WRITE)
-                  }
-                />
-              </Td>
-              <Td>
-                <Input
-                  type="checkbox"
-                  checked={namespace.permissions[POLICY_ACTIONS.DELETE]}
-                  onChange={() =>
-                    togglePermission(namespace.id, POLICY_ACTIONS.DELETE)
-                  }
-                />
-              </Td>
+              {Object.values(POLICY_ACTIONS).map((action) => (
+                <Td key={action}>
+                  <Input
+                    type="checkbox"
+                    checked={namespace.permissions[action as POLICY_ACTIONS]}
+                    onChange={() =>
+                      togglePermission(namespace.id, action as POLICY_ACTIONS)
+                    }
+                  />
+                </Td>
+              ))}
             </Tr>
           ))}
         </tbody>
       </Table>
       <Button
         onClick={async () => {
-          const policies = [];
-          for (const { id, permissions } of namespaces) {
-            if (permissions[POLICY_ACTIONS.READ])
-              policies.push([id, POLICY_ACTIONS.READ]);
-            if (permissions[POLICY_ACTIONS.WRITE])
-              policies.push([id, POLICY_ACTIONS.WRITE]);
-            if (permissions[POLICY_ACTIONS.DELETE])
-              policies.push([id, POLICY_ACTIONS.DELETE]);
-          }
+          const policies: string[][] = [];
+          for (const { id, permissions } of namespaces)
+            Object.values(POLICY_ACTIONS).forEach((action) => {
+              if (permissions[action as POLICY_ACTIONS])
+                policies.push([id, action]);
+            });
           await axios.post('/roles', { roleName, policies });
         }}
       >
