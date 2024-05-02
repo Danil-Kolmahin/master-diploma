@@ -14,58 +14,23 @@ import {
   MembersDtoI,
   EntitiesToReEncryptDtoI,
 } from '@master-diploma/shared-resources';
+import { Button, Input } from './styles/styles';
 
-const PlotContainer = styled.div`
-  width: 100%;
-  height: 100%;
-`;
-
-const NamespaceBlock = styled.div`
+const Invite = styled.div`
   margin-top: 10px;
   margin-bottom: 4px;
-`;
-
-const Input = styled.input`
-  padding: 3px;
-  margin-right: 15px;
-  margin-top: 5px;
-  width: calc(40ch + 20px);
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  &:focus {
-    outline: none;
-    border: 1px solid #ccc;
+  & > * {
+    margin-right: 15px;
+    margin-top: 5px;
   }
 `;
 
-const NamespaceNameInput = styled(Input)`
-  width: calc(20ch + 20px);
-`;
-
-const Button = styled.button`
-  margin-right: 15px;
-  margin-top: 5px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  color: black;
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
-    color: blue;
-    outline: none;
-  }
-`;
-
-const SecretTextDiv = styled.div`
+const User = styled.div`
   margin-top: 3px;
-`;
-
-const SecretText = styled.span`
   font-size: 14px;
 `;
 
-const SecretNameText = styled(SecretText)`
+const UserEmail = styled.span`
   font-weight: bold;
 `;
 
@@ -121,17 +86,15 @@ export const ProjectMembers = () => {
   }, [newNamespaceName, roleName, members]);
 
   return (
-    <PlotContainer>
+    <>
       {members.map((user) => (
-        <SecretTextDiv key={user.id}>
-          <SecretText>
-            <SecretNameText>{user.email}</SecretNameText> | {user.roleName} |{' '}
-            {user.createdAt?.toString()}
-          </SecretText>
-        </SecretTextDiv>
+        <User key={user.id}>
+          <UserEmail>{user.email}</UserEmail> | {user.roleName} | {user.createdAt?.toString()}
+        </User>
       ))}
-      <NamespaceBlock>
-        <NamespaceNameInput
+      <Invite>
+        <Input
+          widthCharsNum={20}
           value={newNamespaceName}
           onChange={(e) => setNewNamespaceName(e.target.value)}
           placeholder="email"
@@ -150,14 +113,15 @@ export const ProjectMembers = () => {
         >
           invite
         </Button>
-        <NamespaceNameInput
+        <Input
+          widthCharsNum={20}
           value={roleName}
           onChange={(e) => setRoleName(e.target.value)}
           placeholder="role"
           type="text"
         />
         <Button onClick={() => setRole()}>set role</Button>
-      </NamespaceBlock>
-    </PlotContainer>
+      </Invite>
+    </>
   );
 };

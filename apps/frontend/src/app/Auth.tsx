@@ -8,7 +8,7 @@ import {
 } from './utils/key-pair';
 import { saveFile } from './utils/file-management';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button } from './styles/styles';
+import { Button, Input } from './styles/styles';
 
 const Container = styled.div`
   display: flex;
@@ -36,18 +36,6 @@ const FormGroup = styled.div`
 const Label = styled.label`
   text-align: center;
   flex: 1;
-`;
-
-const Input = styled.input`
-  padding: 7px;
-  margin-right: 25px;
-  width: calc(40ch + 20px);
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  &:focus {
-    outline: none;
-    border: 1px solid #ccc;
-  }
 `;
 
 const ButtonGroup = styled.div`
@@ -106,6 +94,7 @@ export const Auth = () => {
         <FormGroup>
           <Label htmlFor="email">email</Label>
           <Input
+            padding={7}
             id="email"
             type="email"
             value={email}
@@ -116,6 +105,7 @@ export const Auth = () => {
         <FormGroup>
           <Label htmlFor="project">project</Label>
           <Input
+            padding={7}
             id="project"
             type="text"
             value={projectName}

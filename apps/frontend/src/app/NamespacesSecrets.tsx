@@ -19,6 +19,16 @@ import {
   NamespaceDtoI,
   SecretI,
 } from '@master-diploma/shared-resources';
+import { Button, Input } from './styles/styles';
+
+const Page = styled.div`
+  margin-left: 5px;
+`;
+
+const NamespaceTitle = styled.div`
+  margin-top: 10px;
+  margin-bottom: 4px;
+`;
 
 const NamespacePath = styled.span`
   font-size: 18px;
@@ -29,60 +39,30 @@ const NamespaceName = styled(NamespacePath)`
   font-weight: bold;
 `;
 
-const NamespaceBlock = styled.div`
+const NewNamespace = styled.div`
   margin-top: 10px;
   margin-bottom: 4px;
 `;
 
-const PageBock = styled.div`
-  margin-left: 5px;
-`;
-
-const Input = styled.input`
-  padding: 3px;
-  margin-right: 15px;
-  margin-top: 5px;
-  width: calc(40ch + 20px);
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  &:focus {
-    outline: none;
-    border: 1px solid #ccc;
-  }
-`;
-
-const NamespaceNameInput = styled(Input)`
-  width: calc(20ch + 20px);
-`;
-
-const Button = styled.button`
-  margin-right: 15px;
-  margin-top: 5px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  color: black;
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
-    color: blue;
-    outline: none;
-  }
-`;
-
-const IndentDiv = styled.div`
+const Indent = styled.div`
   margin-left: ${(props: { level: number }) => props.level * 15}px;
 `;
 
-const SecretTextDiv = styled.div`
+const Secrets = styled.div`
   margin-top: 3px;
+  & > * {
+    font-size: 14px;
+  }
 `;
 
-const SecretText = styled.span`
-  font-size: 14px;
+const AddNew = styled.div`
+  & > * {
+    margin-right: 15px;
+    margin-top: 5px;
+  }
 `;
 
-const SecretNameText = styled(SecretText)`
+const SecretName = styled.span`
   font-weight: bold;
 `;
 
@@ -114,6 +94,43 @@ export const NamespacesSecrets = () => {
       }
     })();
   }, [sub]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const namespaces: NamespaceDtoI[] = (await axios('/namespaces')).data;
+        const secrets: SecretI[] = (await axios('/secrets')).data;
+
+        const namespaceMap: Record<string, NamespaceTreeI> = namespaces.reduce(
+          (acc, cur) => ({
+            ...acc,
+            [cur.id]: { ...cur, children: [], secrets: [] },
+          }),
+          {}
+        );
+
+        secrets.forEach((secret) => {
+          if (namespaceMap[secret.namespaceId])
+            namespaceMap[secret.namespaceId].secrets.push(secret);
+        });
+
+        const tree: NamespaceTreeI[] = [];
+        Object.values(namespaceMap).forEach((ns) => {
+          if (ns.parentId === null) tree.push(ns);
+          else {
+            if (namespaceMap[ns.parentId || '']) {
+              const parentNs = namespaceMap[ns.parentId || ''];
+              if (!parentNs.children) parentNs.children = [];
+              parentNs.children.push(ns);
+            }
+          }
+        });
+        setNamespacesTree(tree);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, []);
 
   const createNamespace = useCallback(
     async (name: string, publicKey: string, parentId?: string) => {
@@ -189,30 +206,30 @@ export const NamespacesSecrets = () => {
 
       return (
         <div key={namespace.id}>
-          <NamespaceBlock>
+          <NamespaceTitle>
             <NamespacePath>{path}/</NamespacePath>
             <NamespaceName>{namespace.name}</NamespaceName>
-          </NamespaceBlock>
-          <IndentDiv level={level}>
+          </NamespaceTitle>
+          <Indent level={level}>
             {namespace.secrets.map((secret) => (
-              <SecretTextDiv key={secret.id}>
-                <SecretText
-                  onClick={() =>
-                    decryptAndShowSecret(
-                      secret.encryptedValue,
-                      namespace.encryptedSecurityKey,
-                      secret.id
-                    )
-                  }
-                >
-                  <SecretNameText>{secret.name}</SecretNameText> |{' '}
-                  {decryptedSecrets[secret.id] || secret.encryptedValue} |{' '}
-                  {secret.createdAt?.toString()}
-                </SecretText>
-              </SecretTextDiv>
+              <Secrets
+                key={secret.id}
+                onClick={() =>
+                  decryptAndShowSecret(
+                    secret.encryptedValue,
+                    namespace.encryptedSecurityKey,
+                    secret.id
+                  )
+                }
+              >
+                <SecretName>{secret.name}</SecretName> |{' '}
+                {decryptedSecrets[secret.id] || secret.encryptedValue} |{' '}
+                {secret.createdAt?.toString()}
+              </Secrets>
             ))}
-            <div>
-              <NamespaceNameInput
+            <AddNew>
+              <Input
+                widthCharsNum={20}
                 value={inputs[namespace.id]?.name || ''}
                 onChange={(e) =>
                   handleChange(namespace.id, 'name', e.target.value)
@@ -232,11 +249,11 @@ export const NamespacesSecrets = () => {
               <Button onClick={() => handleCreateSecret(namespace.id)}>
                 add secret
               </Button>
-            </div>
+            </AddNew>
             {namespace.children.map((child) =>
               renderNamespace(child, level + 1, path + '/' + namespace.name)
             )}
-          </IndentDiv>
+          </Indent>
         </div>
       );
     },
@@ -251,48 +268,12 @@ export const NamespacesSecrets = () => {
     ]
   );
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const namespaces: NamespaceDtoI[] = (await axios('/namespaces')).data;
-        const secrets: SecretI[] = (await axios('/secrets')).data;
-
-        const namespaceMap: Record<string, NamespaceTreeI> = namespaces.reduce(
-          (acc, cur) => ({
-            ...acc,
-            [cur.id]: { ...cur, children: [], secrets: [] },
-          }),
-          {}
-        );
-
-        secrets.forEach((secret) => {
-          if (namespaceMap[secret.namespaceId])
-            namespaceMap[secret.namespaceId].secrets.push(secret);
-        });
-
-        const tree: NamespaceTreeI[] = [];
-        Object.values(namespaceMap).forEach((ns) => {
-          if (ns.parentId === null) tree.push(ns);
-          else {
-            if (namespaceMap[ns.parentId || '']) {
-              const parentNs = namespaceMap[ns.parentId || ''];
-              if (!parentNs.children) parentNs.children = [];
-              parentNs.children.push(ns);
-            }
-          }
-        });
-        setNamespacesTree(tree);
-      } catch (error) {
-        console.error(error);
-      }
-    })();
-  }, []);
-
   return (
-    <PageBock>
+    <Page>
       {namespacesTree.map((child) => renderNamespace(child))}
-      <NamespaceBlock>
-        <NamespaceNameInput
+      <NewNamespace>
+        <Input
+          widthCharsNum={20}
           value={newNamespaceName}
           onChange={(e) => setNewNamespaceName(e.target.value)}
           placeholder="name"
@@ -300,7 +281,7 @@ export const NamespacesSecrets = () => {
         <Button onClick={() => createNamespace(newNamespaceName, publicKey)}>
           add namespace
         </Button>
-      </NamespaceBlock>
-    </PageBock>
+      </NewNamespace>
+    </Page>
   );
 };

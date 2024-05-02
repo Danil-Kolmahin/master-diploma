@@ -1,56 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios, { AxiosResponse } from 'axios';
-import styled from '@emotion/styled';
 import { useParams } from 'react-router-dom';
 import {
   NamespaceDtoI,
   POLICY_ACTIONS,
   RoleContentDtoI,
 } from '@master-diploma/shared-resources';
-
-const Table = styled.table`
-  width: 80%;
-  margin: 20px auto;
-`;
-
-const Th = styled.th`
-  border: 1px solid #ccc; // Light grey border for header cells
-  background-color: #f4f4f4; // Light background for headers
-  padding: 8px; // Padding inside the header cells
-  text-align: left; // Aligns text to the left
-`;
-
-const Td = styled.td`
-  border: 1px solid #ccc; // Light grey border for data cells
-  padding: 8px; // Padding inside data cells
-  text-align: center; // Centers the content of the cell
-`;
-
-const Tr = styled.tr`
-  &:nth-of-type(even) {
-    background-color: #f9f9f9; // Zebra striping for rows
-  }
-`;
-
-const Input = styled.input`
-  padding: 0px;
-  margin: 0px;
-`;
-
-const Button = styled.button`
-  margin-right: 15px;
-  margin-top: 5px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  color: black;
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
-    color: blue;
-    outline: none;
-  }
-`;
+import { Button, Table, Td, Th, Tr } from './styles/styles';
 
 type FormattedNamespacePermissionsI = {
   [key in POLICY_ACTIONS]: boolean;
@@ -130,7 +86,7 @@ export const Role = () => {
               <Td>{namespace.name}</Td>
               {Object.values(POLICY_ACTIONS).map((action) => (
                 <Td key={action}>
-                  <Input
+                  <input
                     type="checkbox"
                     checked={namespace.permissions[action as POLICY_ACTIONS]}
                     onChange={() =>
@@ -144,6 +100,7 @@ export const Role = () => {
         </tbody>
       </Table>
       <Button
+        style={{ marginRight: '15px', marginTop: '5px' }}
         onClick={async () => {
           const policies: string[][] = [];
           for (const { id, permissions } of namespaces)
