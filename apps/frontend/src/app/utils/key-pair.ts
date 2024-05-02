@@ -1,4 +1,4 @@
-export const generateKeyPair = async (): Promise<CryptoKeyPair> =>
+export const genAsymmetricKeyPair = async (): Promise<CryptoKeyPair> =>
   crypto.subtle.generateKey(
     {
       name: 'RSA-OAEP',
@@ -25,7 +25,7 @@ const str2ab = (str: string): ArrayBuffer => {
   return buf;
 };
 
-export const extractPublicKey = async (
+export const asymmetricPubKey2str = async (
   publicKey: CryptoKey
 ): Promise<string> => {
   const exportedPublicKey = await crypto.subtle.exportKey('spki', publicKey);
@@ -34,7 +34,7 @@ export const extractPublicKey = async (
   )}\n-----END PUBLIC KEY-----`;
 };
 
-export const extractPrivateKey = async (
+export const asymmetricPrivKey2str = async (
   privateKey: CryptoKey
 ): Promise<string> => {
   const exportedPrivateKey = await crypto.subtle.exportKey('pkcs8', privateKey);
@@ -43,7 +43,7 @@ export const extractPrivateKey = async (
   )}\n-----END PRIVATE KEY-----`;
 };
 
-export const getPrivateKeyFromString = async (
+export const str2asymmetricPrivKey = async (
   string: string
 ): Promise<CryptoKey> => {
   const pemHeader = '-----BEGIN PRIVATE KEY-----';
@@ -66,7 +66,7 @@ export const getPrivateKeyFromString = async (
   );
 };
 
-export const getPublicKeyFromString = async (
+export const str2asymmetricPubKey = async (
   string: string
 ): Promise<CryptoKey> => {
   const pemHeader = '-----BEGIN PUBLIC KEY-----';
@@ -88,43 +88,53 @@ export const getPublicKeyFromString = async (
   );
 };
 
-export const generateSymmetricKey = (): Promise<CryptoKey> =>
+export const genSymmetricKey = (): Promise<CryptoKey> =>
   crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, [
     'encrypt',
     'decrypt',
   ]);
 
-export const encryptSymmetricKey = async (
-  symmetricKey: CryptoKey,
+export const asymmetricStrEncrypt = async (
+  data: string,
   publicKey: CryptoKey
 ): Promise<string> => {
   const result = await crypto.subtle.encrypt(
     { name: 'RSA-OAEP' },
     publicKey,
-    await crypto.subtle.exportKey('raw', symmetricKey)
+    str2ab(data)
   );
   return window.btoa(ab2str(result));
 };
 
-export const decryptSymmetricKey = async (
-  encryptedKey: string,
+export const asymmetricStrDecrypt = async (
+  data: string,
   privateKey: CryptoKey
-): Promise<CryptoKey> => {
-  const decryptedKey = await crypto.subtle.decrypt(
+): Promise<string> => {
+  const result = await crypto.subtle.decrypt(
     { name: 'RSA-OAEP' },
     privateKey,
-    str2ab(window.atob(encryptedKey))
+    str2ab(window.atob(data))
   );
-  return crypto.subtle.importKey(
+  return ab2str(result);
+};
+
+export const symmetricKey2str = async (
+  symmetricKey: CryptoKey
+): Promise<string> => {
+  const exportedKey = await crypto.subtle.exportKey('raw', symmetricKey);
+  return window.btoa(ab2str(exportedKey));
+};
+
+export const str2symmetricKey = async (string: string): Promise<CryptoKey> =>
+  crypto.subtle.importKey(
     'raw',
-    decryptedKey,
+    str2ab(window.atob(string)),
     { name: 'AES-GCM' },
     true,
     ['encrypt', 'decrypt']
   );
-};
 
-export const encryptData = async (
+export const symmetricStrEncrypt = async (
   data: string,
   symmetricKey: CryptoKey
 ): Promise<string> => {
@@ -137,7 +147,7 @@ export const encryptData = async (
   return window.btoa(ab2str(encryptedData));
 };
 
-export const decryptData = async (
+export const symmetricStrDecrypt = async (
   encryptedData: string,
   symmetricKey: CryptoKey
 ): Promise<string> => {

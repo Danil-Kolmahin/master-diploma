@@ -2,12 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import styled from '@emotion/styled';
 import {
-  decryptData,
-  decryptSymmetricKey,
-  encryptData,
-  encryptSymmetricKey,
-  generateSymmetricKey,
-  getPublicKeyFromString,
+  symmetricStrDecrypt,
+  symmetricStrEncrypt,
+  genSymmetricKey,
+  str2asymmetricPubKey,
+  symmetricKey2str,
+  asymmetricStrEncrypt,
+  asymmetricStrDecrypt,
+  str2symmetricKey,
 } from './utils/key-pair';
 import { useOutletContext } from 'react-router-dom';
 import { getFromDB } from './utils/indexed-db';
@@ -105,8 +107,8 @@ export const NamespacesSecrets = () => {
     (async () => {
       try {
         const members: MembersDtoI[] = (await axios(`/members`)).data;
-        const user = members.find((member) => member.id === sub) as MembersDtoI;
-        setPublicKey(user.publicKey);
+        const user = members.find((member) => member.id === sub);
+        setPublicKey(user?.publicKey || '');
       } catch (error) {
         console.error(error);
       }
@@ -115,10 +117,11 @@ export const NamespacesSecrets = () => {
 
   const createNamespace = useCallback(
     async (name: string, publicKey: string, parentId?: string) => {
-      const symmetricKey = await generateSymmetricKey();
-      const encryptedSecurityKey = await encryptSymmetricKey(
-        symmetricKey,
-        await getPublicKeyFromString(publicKey)
+      const symmetricKey = await genSymmetricKey();
+      const strSymmetricKey = await symmetricKey2str(symmetricKey);
+      const encryptedSecurityKey = await asymmetricStrEncrypt(
+        strSymmetricKey,
+        await str2asymmetricPubKey(publicKey)
       );
       await axios.post('/namespaces', { name, encryptedSecurityKey, parentId });
     },
@@ -132,11 +135,12 @@ export const NamespacesSecrets = () => {
       namespaceId: string,
       encryptedSecurityKey: string
     ) => {
-      const symmetricKey = await decryptSymmetricKey(
+      const securityKey = await asymmetricStrDecrypt(
         encryptedSecurityKey,
         await getFromDB()
       );
-      const encryptedValue = await encryptData(data, symmetricKey);
+      const symmetricKey = await str2symmetricKey(securityKey);
+      const encryptedValue = await symmetricStrEncrypt(data, symmetricKey);
       await axios.post('/secrets', { name, encryptedValue, namespaceId });
     },
     []
@@ -149,12 +153,15 @@ export const NamespacesSecrets = () => {
       secretId: string
     ) => {
       if (decryptedSecrets[secretId]) return;
-
-      const symmetricKey = await decryptSymmetricKey(
+      const securityKey = await asymmetricStrDecrypt(
         encryptedSecurityKey,
         await getFromDB()
       );
-      const decryptedValue = await decryptData(encryptedValue, symmetricKey);
+      const symmetricKey = await str2symmetricKey(securityKey);
+      const decryptedValue = await symmetricStrDecrypt(
+        encryptedValue,
+        symmetricKey
+      );
       setDecryptedSecrets((prev) => ({ ...prev, [secretId]: decryptedValue }));
     },
     [decryptedSecrets]

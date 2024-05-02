@@ -3,9 +3,11 @@ import axios, { AxiosResponse } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
-  decryptSymmetricKey,
-  encryptSymmetricKey,
-  getPublicKeyFromString,
+  asymmetricStrDecrypt,
+  asymmetricStrEncrypt,
+  str2asymmetricPubKey,
+  str2symmetricKey,
+  symmetricKey2str,
 } from './utils/key-pair';
 import { getFromDB } from './utils/indexed-db';
 import {
@@ -93,16 +95,17 @@ export const ProjectMembers = () => {
     const entities: EntitiesToReEncryptDtoI[] = (
       await axios(`/roles/${roleName}/access-requirements`)
     ).data;
-    const privateKey = await getFromDB();
     const reEntities = await Promise.all(
       entities.map(async (entity) => {
-        const symmetricKey = await decryptSymmetricKey(
+        const securityKey = await asymmetricStrDecrypt(
           entity.encryptedSecurityKey,
-          privateKey
+          await getFromDB()
         );
-        const reEncryptedSecurityKey = await encryptSymmetricKey(
-          symmetricKey,
-          await getPublicKeyFromString(user.publicKey)
+        const symmetricKey = await str2symmetricKey(securityKey);
+        const strSymmetricKey = await symmetricKey2str(symmetricKey);
+        const reEncryptedSecurityKey = await asymmetricStrEncrypt(
+          strSymmetricKey,
+          await str2asymmetricPubKey(user.publicKey)
         );
         return {
           entityId: entity.entityId,

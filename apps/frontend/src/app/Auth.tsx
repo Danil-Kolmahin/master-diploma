@@ -2,9 +2,9 @@ import styled from '@emotion/styled';
 import axios from 'axios';
 import { useCallback, useState } from 'react';
 import {
-  extractPrivateKey,
-  extractPublicKey,
-  generateKeyPair,
+  asymmetricPrivKey2str,
+  asymmetricPubKey2str,
+  genAsymmetricKeyPair,
 } from './utils/key-pair';
 import { saveFile } from './utils/file-management';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -75,18 +75,18 @@ export const Auth = () => {
   const signUp = useCallback(
     async (email: string, projectName: string) => {
       try {
-        let keyPair: CryptoKeyPair | null = await generateKeyPair();
+        let keyPair: CryptoKeyPair | null = await genAsymmetricKeyPair();
         await axios.post(
           'members',
           {
             email,
-            publicKey: await extractPublicKey(keyPair.publicKey),
+            publicKey: await asymmetricPubKey2str(keyPair.publicKey),
             projectName,
           },
           { params: { inviteToken } }
         );
         saveFile(
-          await extractPrivateKey(keyPair.privateKey),
+          await asymmetricPrivKey2str(keyPair.privateKey),
           'private_key.pem',
           'application/pem-certificate-chain'
         );
