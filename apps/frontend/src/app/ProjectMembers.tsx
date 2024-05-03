@@ -14,7 +14,7 @@ import {
   MembersDtoI,
   EntitiesToReEncryptDtoI,
 } from '@master-diploma/shared-resources';
-import { Button, Input } from './styles/styles';
+import { Bold, Button, Input } from './styles/styles';
 
 const Invite = styled.div`
   margin-top: 10px;
@@ -28,10 +28,6 @@ const Invite = styled.div`
 const User = styled.div`
   margin-top: 3px;
   font-size: 14px;
-`;
-
-const UserEmail = styled.span`
-  font-weight: bold;
 `;
 
 export const ProjectMembers = () => {
@@ -89,7 +85,8 @@ export const ProjectMembers = () => {
     <>
       {members.map((user) => (
         <User key={user.id}>
-          <UserEmail>{user.email}</UserEmail> | {user.roleName} | {user.createdAt?.toString()}
+          <Bold>{user.email}</Bold> | {user.roleName} |{' '}
+          {user.createdAt?.toString()}
         </User>
       ))}
       <Invite>

@@ -11,6 +11,8 @@ import { ProjectMembers } from './ProjectMembers';
 import { RolesPolicies } from './RolesPolicies';
 import { Role } from './Role';
 import { Audit } from './Audit';
+import { Button } from './styles/styles';
+import axios from 'axios';
 
 const GlobalStyle = css`
   * {
@@ -40,6 +42,18 @@ export const App = () => {
   return (
     <>
       <Global styles={GlobalStyle} />
+      <Button
+        style={{
+          position: 'absolute',
+          top: '35px',
+          right: '40px',
+          textDecoration: 'underline',
+          color: 'blue',
+        }}
+        onClick={() => window.open(axios.defaults.baseURL, '_blank')?.focus()}
+      >
+        API
+      </Button>
       <StyledApp>
         <Routes>
           <Route path="/auth" element={<Auth />} />

@@ -5,6 +5,7 @@ import { getTextFromFile } from './utils/file-management';
 import { str2asymmetricPrivKey } from './utils/key-pair';
 import { getFromDB, saveToDB } from './utils/indexed-db';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Bold, BoldNRed, WarningMessage } from './styles/styles';
 
 const Container = styled.div`
   display: flex;
@@ -100,6 +101,15 @@ export const PrivateKeyCatcher = () => {
         catchFiles(event.dataTransfer.files);
       }}
     >
+      <WarningMessage>
+        <Bold>
+          Important: Ensure your environment is secure before proceeding.
+        </Bold>{' '}
+        Do not use shared or public computers. Verify that your browser and any
+        extensions are secure and up to date.{' '}
+        <BoldNRed>Never share your private keys with anyone.</BoldNRed> Failure
+        to follow these guidelines may compromise your data security.
+      </WarningMessage>
       <HiddenFileInput
         type="file"
         id="privateKey"

@@ -19,7 +19,7 @@ import {
   NamespaceDtoI,
   SecretI,
 } from '@master-diploma/shared-resources';
-import { Button, Input } from './styles/styles';
+import { Bold, Button, Input } from './styles/styles';
 
 const Page = styled.div`
   margin-left: 5px;
@@ -60,10 +60,6 @@ const AddNew = styled.div`
     margin-right: 15px;
     margin-top: 5px;
   }
-`;
-
-const SecretName = styled.span`
-  font-weight: bold;
 `;
 
 interface NamespaceTreeI extends NamespaceDtoI {
@@ -222,7 +218,7 @@ export const NamespacesSecrets = () => {
                   )
                 }
               >
-                <SecretName>{secret.name}</SecretName> |{' '}
+                <Bold>{secret.name}</Bold> |{' '}
                 {decryptedSecrets[secret.id] || secret.encryptedValue} |{' '}
                 {secret.createdAt?.toString()}
               </Secrets>

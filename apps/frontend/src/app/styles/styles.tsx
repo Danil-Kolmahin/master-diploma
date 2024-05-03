@@ -47,3 +47,21 @@ export const Tr = styled.tr`
     background-color: #f9f9f9;
   }
 `;
+
+export const WarningMessage = styled.div`
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  text-align: center;
+  font-size: 14px;
+`;
+
+export const Bold = styled.span`
+  font-weight: bold;
+`;
+
+export const BoldNRed = styled(Bold)`
+  color: red;
+`;

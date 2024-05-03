@@ -8,7 +8,7 @@ import {
 } from './utils/key-pair';
 import { saveFile } from './utils/file-management';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Input } from './styles/styles';
+import { Bold, BoldNRed, Button, Input, WarningMessage } from './styles/styles';
 
 const Container = styled.div`
   display: flex;
@@ -90,6 +90,15 @@ export const Auth = () => {
 
   return (
     <Container>
+      <WarningMessage>
+        <Bold>
+          Important: Ensure your environment is secure before proceeding.
+        </Bold>{' '}
+        Do not use shared or public computers. Verify that your browser and any
+        extensions are secure and up to date.{' '}
+        <BoldNRed>Never share your private keys with anyone.</BoldNRed> Failure
+        to follow these guidelines may compromise your data security.
+      </WarningMessage>
       <Form>
         <FormGroup>
           <Label htmlFor="email">email</Label>
