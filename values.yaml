@@ -13,11 +13,13 @@ services:
 
 ingresses:
   - service: backend
-    host: localhost
+    host: ideal-octo-chainsaw.xyz
+    clusterIssuer: letsencrypt-staging
     paths:
       - /api{whatever:.*}
   - service: frontend
-    host: localhost
+    host: ideal-octo-chainsaw.xyz
+    clusterIssuer: letsencrypt-staging
     paths:
       - /{whatever:.+}
 
