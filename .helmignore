@@ -24,3 +24,7 @@
 # other
 node_modules/
 dist/
+scripts/
+docs/
+libs/
+apps/
