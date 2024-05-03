@@ -21,7 +21,7 @@ ingresses:
     host: ideal-octo-chainsaw.xyz
     clusterIssuer: letsencrypt-staging
     paths:
-      - /{whatever:.+}
+      - /{path:.*}
 
 secrets:
   DATABASE_PASSWORD:
