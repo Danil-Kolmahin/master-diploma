@@ -28,3 +28,6 @@ scripts/
 docs/
 libs/
 apps/
+.github/
+.nx/
+package-lock.json
