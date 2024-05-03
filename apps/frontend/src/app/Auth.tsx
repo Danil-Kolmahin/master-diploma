@@ -31,6 +31,9 @@ const FormGroup = styled.div`
   justify-content: space-between; // Separate label and input
   align-items: center;
   width: 100%;
+  & > input {
+    margin-right: 25px;
+  }
 `;
 
 const Label = styled.label`
