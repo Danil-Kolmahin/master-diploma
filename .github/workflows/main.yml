@@ -39,3 +39,4 @@ jobs:
           helm upgrade -i -f values.yaml master-diploma . \
           --set version=${{ env.VERSION }} \
           --set secrets.DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+          --set secrets.JWT_SECRET=${{ secrets.JWT_SECRET }}

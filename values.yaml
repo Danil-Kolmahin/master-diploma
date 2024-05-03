@@ -5,6 +5,7 @@ deployments:
     image: danilkolmahin/master-diploma
     env:
       DATABASE_PASSWORD:
+      JWT_SECRET:
 
 services:
   - app: frontend
@@ -22,3 +23,4 @@ ingresses:
 
 secrets:
   DATABASE_PASSWORD:
+  JWT_SECRET:
