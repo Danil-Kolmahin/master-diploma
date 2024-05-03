@@ -36,6 +36,7 @@ jobs:
           mkdir $HOME/.kube
           echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
           chmod 644 $HOME/.kube/config
+          ls -la
           helm upgrade -i -f values.yaml master-diploma . \
           --set version=${{ env.VERSION }} \
           --set secrets.DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
