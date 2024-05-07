@@ -1,0 +1,13 @@
+@startuml registration
+actor Клієнт as Client
+participant Система as System
+
+Client -> Client : Генерація криптографічної пари ключів
+Client -> Client : Збереження приватного ключа
+Client -> System : Запит на реєстрацію
+note right
+  В запиті на реєстрацію користувач передає email та
+  публічний ключ, яким в подальшому оперуватиме система
+end note
+System -> Client : Реєстрацію закінчено
+@enduml
