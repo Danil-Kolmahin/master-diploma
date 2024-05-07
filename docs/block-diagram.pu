@@ -1,0 +1,48 @@
+@startuml block-diagram
+
+cloud internet {
+  package browsers {
+    node client1
+    node client2
+  }
+  package server-applications {
+    node client3
+    node client4
+  }
+}
+
+node node {
+  interface HTTPS as k3sHTTPS
+
+  frame "Kubernetes cluster (k3s)" as k3s {
+    interface HTTP as frontendHTTP
+    interface HTTP as backendHTTP
+
+    queue "ingress-controller\n(Traefik)" as ingressController
+    folder monorepository {
+      component "REST-API\n(backend)" as backend
+      component "browser-client\n(frontend)" as frontend
+
+      file "shared-library\n(shared-resources)" as sharedResources
+    }
+    database "database\n(PostgreSQL)" as database
+  }
+}
+
+sharedResources --> frontend
+sharedResources --> backend
+
+frontendHTTP <.. frontend
+backendHTTP <.. backend
+k3sHTTPS <.. ingressController
+
+frontendHTTP <-- ingressController
+backendHTTP <-- ingressController
+backend <--> database
+
+client1 --> k3sHTTPS
+client2 --> k3sHTTPS
+client3 --> k3sHTTPS
+client4 --> k3sHTTPS
+
+@enduml
