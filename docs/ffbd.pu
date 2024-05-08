@@ -31,7 +31,7 @@ table( invite ) {
  column( body ): CHARACTER VARYING
  column( expiresAt ): TIMESTAMP
  column( email ): CHARACTER VARYING
- column( projectName ): CHARACTER VARYING
+ foreign_key( projectId ): UUID
 }
 
 table( namespace ) {
@@ -39,8 +39,8 @@ table( namespace ) {
  column( createdAt ): TIMESTAMP
  column( updatedAt ): TIMESTAMP
  column( name ): CHARACTER VARYING
- foreign_key( parentId ): UUID <<FK>>
- foreign_key( projectId ): UUID <<FK>>
+ foreign_key( parentId ): UUID
+ foreign_key( projectId ): UUID
 }
 
 table( project ) {
@@ -57,9 +57,6 @@ table( rule ) {
  column( v1 ): CHARACTER VARYING
  column( v2 ): CHARACTER VARYING
  column( v3 ): CHARACTER VARYING
- column( v4 ): CHARACTER VARYING
- column( v5 ): CHARACTER VARYING
- column( v6 ): CHARACTER VARYING
  column( createdAt ): TIMESTAMP
  column( updatedAt ): TIMESTAMP
 }
@@ -70,26 +67,26 @@ table( secret ) {
  column( updatedAt ): TIMESTAMP
  column( name ): CHARACTER VARYING
  column( encryptedValue ): CHARACTER VARYING
- foreign_key( namespaceId ): UUID <<FK>>
- foreign_key( projectId ): UUID <<FK>>
+ foreign_key( namespaceId ): UUID
+ foreign_key( projectId ): UUID
 }
 
 table( security_key ) {
  primary_key( id ): UUID
  column( createdAt ): TIMESTAMP
  column( updatedAt ): TIMESTAMP
- foreign_key( userId ): UUID <<FK>>
+ foreign_key( userId ): UUID
  foreign_key( entityId ): UUID
  column( encryptedKey ): CHARACTER VARYING
- foreign_key( projectId ): UUID <<FK>>
+ foreign_key( projectId ): UUID
 }
 
 table( trace ) {
  primary_key( id ): UUID
  column( createdAt ): TIMESTAMP
  column( updatedAt ): TIMESTAMP
- foreign_key( userId ): UUID <<FK>>
- foreign_key( projectId ): UUID <<FK>>
+ foreign_key( userId ): UUID
+ foreign_key( projectId ): UUID
  column( url ): CHARACTER VARYING
  column( method ): CHARACTER VARYING
  column( body ): CHARACTER VARYING
@@ -107,9 +104,14 @@ table( user ) {
 project ||--o{ namespace
 user ||--o{ security_key
 namespace ||--o{ secret
+namespace ||--o| namespace
 project ||--o{ secret
 user ||--o{ trace
 project ||--o{ trace
+project ||--o{ invite
+namespace ||--o{ security_key
+user ||--o{ rule
+namespace ||--o{ rule
 
 @enduml
 
