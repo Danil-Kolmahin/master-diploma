@@ -2,12 +2,12 @@
 
 autonumber
 
-title PGP-RBAC granular access safeguarding model \n Гранулярна модель убезпечення доступів на основі PGP-RBAC
+title PGP-RBAC granular access safeguarding model \n Гранулярна модель захисту доступів на основі PGP-RBAC
 
 actor "Користувач" as User
 participant "Система" as System
 
-== Safeguarding new entity with data\n(Убезпечення нової сутності з її даними) ==
+== Safeguarding new entity with data\n(Захист нової сутності з її даними) ==
 User -> User : Генерація симетричного ключа
 note right
   На цьому етапі користувач вже визначився з тим,
