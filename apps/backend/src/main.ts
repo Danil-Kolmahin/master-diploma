@@ -4,6 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import nocache from 'nocache';
 import { join } from 'path';
 
 import { COOKIE_NAME } from '@master-diploma/shared-resources';
@@ -13,7 +14,29 @@ import { AppModule } from './app/app.module';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.use(helmet());
+  const SITE_URL = 'ideal-octo-chainsaw.xyz';
+
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", SITE_URL],
+          styleSrc: ["'self'", SITE_URL, "'sha256-abc123'"],
+          imgSrc: ["'self'", SITE_URL],
+        },
+      },
+      frameguard: { action: 'deny' },
+      xPoweredBy: false,
+      strictTransportSecurity: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true,
+      },
+      xContentTypeOptions: false,
+    })
+  );
+  app.use(nocache());
 
   app.setGlobalPrefix('api');
 
